@@ -1,0 +1,52 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:133.0) Gecko/20100101 Firefox/133.0" version="26.0.1">
+  <diagram name="Page-1" id="aOiS0c9mGoQKlmykol_s">
+    <mxGraphModel dx="989" dy="514" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="81Ag_pJoJxCxscV1p3fW-2" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontFamily=Times New Roman;labelPosition=center;verticalLabelPosition=middle;align=center;verticalAlign=middle;" parent="1" vertex="1">
+          <mxGeometry x="80" y="40" width="160" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="81Ag_pJoJxCxscV1p3fW-3" value="&lt;font face=&quot;Times New Roman&quot;&gt;Camera - OAK-D Lite&lt;br&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="80" y="40" width="130" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="81Ag_pJoJxCxscV1p3fW-4" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="100" y="100" width="120" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="81Ag_pJoJxCxscV1p3fW-5" value="&lt;font face=&quot;Times New Roman&quot;&gt;Detection Model - YOLO&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="110" y="120" width="100" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="81Ag_pJoJxCxscV1p3fW-6" value="USB-C" style="endArrow=classic;startArrow=classic;html=1;rounded=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;fontFamily=Times New Roman;" parent="1" source="81Ag_pJoJxCxscV1p3fW-2" target="81Ag_pJoJxCxscV1p3fW-7" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="238.65" y="119.66" as="sourcePoint" />
+            <mxPoint x="319.9999999999999" y="120.05999999999997" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="81Ag_pJoJxCxscV1p3fW-7" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FF9999;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="320" y="40" width="160" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="81Ag_pJoJxCxscV1p3fW-8" value="&lt;font face=&quot;Times New Roman&quot;&gt;Control Board - Raspberry Pi&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+          <mxGeometry x="320" y="40" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="LOffOAQ_iD_wmm6UVOWZ-1" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="81Ag_pJoJxCxscV1p3fW-7">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="470" y="145" as="sourcePoint" />
+            <mxPoint x="560" y="140" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LOffOAQ_iD_wmm6UVOWZ-2" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="560" y="40" width="160" height="200" as="geometry" />
+        </mxCell>
+        <mxCell id="LOffOAQ_iD_wmm6UVOWZ-3" value="&lt;font face=&quot;Times New Roman&quot;&gt;Notification Module&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="560" y="40" width="120" height="40" as="geometry" />
+        </mxCell>
+        <mxCell id="LOffOAQ_iD_wmm6UVOWZ-4" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="340" y="100" width="120" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="LOffOAQ_iD_wmm6UVOWZ-5" value="&lt;font face=&quot;Times New Roman&quot;&gt;Danger detection logic/algorithm&lt;br&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="355" y="120" width="90" height="40" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
