@@ -1,13 +1,16 @@
+#!/usr/bin/env python
+import os
 import cv2
 import torch
-from ultralytics import YOLOv10 as YOLO
+from ultralytics import  YOLO
 
 # Load the YOLOv8 model (choose 'yolov8n.pt', 'yolov8s.pt', etc. for different sizes)
-model = YOLO('./runs/detect/train/weights/last.pt')  # or another version of YOLOv8 (e.g., yolov8s.pt for small)
+model = YOLO('./runs/detect/train5/weights/last.pt')  # or another version of YOLOv8 (e.g., yolov8s.pt for small)
 
 # Load the video file
-input_video_path = 'video.mp4'
-output_video_path = 'out.mp4'
+cwd = os.getcwd()
+input_video_path = os.path.join(cwd,'evaluation_vids/input/4p9Zk12iE8s.mp4')
+output_video_path = os.path.join(cwd,'evaluation_vids/output/out.mp4')
 
 # Open the video using OpenCV
 video_capture = cv2.VideoCapture(input_video_path)

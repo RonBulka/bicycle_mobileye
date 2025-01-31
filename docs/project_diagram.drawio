@@ -1,13 +1,13 @@
-<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.0.3 Chrome/130.0.6723.137 Electron/33.2.1 Safari/537.36" version="26.0.3">
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.0.9 Chrome/128.0.6613.186 Electron/32.2.5 Safari/537.36" version="26.0.9">
   <diagram name="Page-1" id="jrYj4dkKSTAObUcjDqnu">
-    <mxGraphModel dx="1005" dy="973" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1434" dy="836" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="jJ5OT3zxO4tT-exIczNe-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="jJ5OT3zxO4tT-exIczNe-2" target="jJ5OT3zxO4tT-exIczNe-3">
+        <mxCell id="jJ5OT3zxO4tT-exIczNe-11" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="jJ5OT3zxO4tT-exIczNe-2" target="jJ5OT3zxO4tT-exIczNe-3" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="jJ5OT3zxO4tT-exIczNe-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="jJ5OT3zxO4tT-exIczNe-2" target="jJ5OT3zxO4tT-exIczNe-6">
+        <mxCell id="jJ5OT3zxO4tT-exIczNe-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="jJ5OT3zxO4tT-exIczNe-2" target="jJ5OT3zxO4tT-exIczNe-6" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="240" y="330" as="targetPoint" />
             <Array as="points">
@@ -16,7 +16,7 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="jJ5OT3zxO4tT-exIczNe-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="jJ5OT3zxO4tT-exIczNe-2" target="jJ5OT3zxO4tT-exIczNe-14">
+        <mxCell id="jJ5OT3zxO4tT-exIczNe-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="jJ5OT3zxO4tT-exIczNe-2" target="jJ5OT3zxO4tT-exIczNe-14" edge="1">
           <mxGeometry relative="1" as="geometry">
             <Array as="points">
               <mxPoint x="240" y="80" />
@@ -24,55 +24,55 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="jJ5OT3zxO4tT-exIczNe-2" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;הכרות עם רכיבי פרויקט&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+        <mxCell id="jJ5OT3zxO4tT-exIczNe-2" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;הכרות עם רכיבי פרויקט&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
           <mxGeometry x="40" y="40" width="160" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="jJ5OT3zxO4tT-exIczNe-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="jJ5OT3zxO4tT-exIczNe-3" target="jJ5OT3zxO4tT-exIczNe-18">
+        <mxCell id="jJ5OT3zxO4tT-exIczNe-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="jJ5OT3zxO4tT-exIczNe-3" target="jJ5OT3zxO4tT-exIczNe-18" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="jJ5OT3zxO4tT-exIczNe-3" value="&lt;span style=&quot;&quot; dir=&quot;RTL&quot; lang=&quot;HE&quot;&gt;&lt;font face=&quot;Helvetica&quot; style=&quot;font-size: 18px;&quot;&gt;הגדרת&amp;nbsp; API&lt;/font&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+        <mxCell id="jJ5OT3zxO4tT-exIczNe-3" value="&lt;span style=&quot;&quot; dir=&quot;RTL&quot; lang=&quot;HE&quot;&gt;&lt;font face=&quot;Helvetica&quot; style=&quot;font-size: 18px;&quot;&gt;הגדרת&amp;nbsp; API&lt;/font&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
           <mxGeometry x="280" y="40" width="160" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="jJ5OT3zxO4tT-exIczNe-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="jJ5OT3zxO4tT-exIczNe-4" target="jJ5OT3zxO4tT-exIczNe-5">
+        <mxCell id="jJ5OT3zxO4tT-exIczNe-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="jJ5OT3zxO4tT-exIczNe-4" target="jJ5OT3zxO4tT-exIczNe-5" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="jJ5OT3zxO4tT-exIczNe-4" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;הכרת המודל&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+        <mxCell id="jJ5OT3zxO4tT-exIczNe-4" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;הכרת המודל&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
           <mxGeometry x="40" y="400" width="160" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="jJ5OT3zxO4tT-exIczNe-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="jJ5OT3zxO4tT-exIczNe-5" target="jJ5OT3zxO4tT-exIczNe-8">
+        <mxCell id="jJ5OT3zxO4tT-exIczNe-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="jJ5OT3zxO4tT-exIczNe-5" target="jJ5OT3zxO4tT-exIczNe-8" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="jJ5OT3zxO4tT-exIczNe-5" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;איסוף מידע לאימון מודל&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+        <mxCell id="jJ5OT3zxO4tT-exIczNe-5" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;איסוף מידע לאימון מודל&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
           <mxGeometry x="280" y="400" width="160" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="jJ5OT3zxO4tT-exIczNe-25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="jJ5OT3zxO4tT-exIczNe-6" target="jJ5OT3zxO4tT-exIczNe-22">
+        <mxCell id="jJ5OT3zxO4tT-exIczNe-25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="jJ5OT3zxO4tT-exIczNe-6" target="jJ5OT3zxO4tT-exIczNe-22" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="jJ5OT3zxO4tT-exIczNe-6" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;אינטגרציה של המודל עם המצלמה&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+        <mxCell id="jJ5OT3zxO4tT-exIczNe-6" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;אינטגרציה של המודל עם המצלמה&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
           <mxGeometry x="760" y="280" width="160" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="jJ5OT3zxO4tT-exIczNe-7" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;דוח אפיון&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+        <mxCell id="jJ5OT3zxO4tT-exIczNe-7" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;דוח אפיון&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
           <mxGeometry x="40" y="520" width="160" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="jJ5OT3zxO4tT-exIczNe-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="jJ5OT3zxO4tT-exIczNe-8" target="jJ5OT3zxO4tT-exIczNe-6">
+        <mxCell id="jJ5OT3zxO4tT-exIczNe-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="jJ5OT3zxO4tT-exIczNe-8" target="jJ5OT3zxO4tT-exIczNe-6" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="jJ5OT3zxO4tT-exIczNe-8" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;אימון המודל&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+        <mxCell id="jJ5OT3zxO4tT-exIczNe-8" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;אימון המודל&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
           <mxGeometry x="520" y="400" width="160" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="jJ5OT3zxO4tT-exIczNe-23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="jJ5OT3zxO4tT-exIczNe-14" target="jJ5OT3zxO4tT-exIczNe-22">
+        <mxCell id="jJ5OT3zxO4tT-exIczNe-23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="jJ5OT3zxO4tT-exIczNe-14" target="jJ5OT3zxO4tT-exIczNe-22" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="jJ5OT3zxO4tT-exIczNe-14" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;אינטגרציה של המצלמה עם כרטיס הבקרה&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+        <mxCell id="jJ5OT3zxO4tT-exIczNe-14" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;אינטגרציה של המצלמה עם כרטיס הבקרה&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
           <mxGeometry x="520" y="160" width="160" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="jJ5OT3zxO4tT-exIczNe-21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="jJ5OT3zxO4tT-exIczNe-18" target="jJ5OT3zxO4tT-exIczNe-20">
+        <mxCell id="jJ5OT3zxO4tT-exIczNe-21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="jJ5OT3zxO4tT-exIczNe-18" target="jJ5OT3zxO4tT-exIczNe-20" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="jJ5OT3zxO4tT-exIczNe-18" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;לוגיקה לזיהוי סכנה&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+        <mxCell id="jJ5OT3zxO4tT-exIczNe-18" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;לוגיקה לזיהוי סכנה&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
           <mxGeometry x="520" y="40" width="160" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="jJ5OT3zxO4tT-exIczNe-24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="jJ5OT3zxO4tT-exIczNe-20">
+        <mxCell id="jJ5OT3zxO4tT-exIczNe-24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="jJ5OT3zxO4tT-exIczNe-20" edge="1">
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="1000" y="200" as="targetPoint" />
             <Array as="points">
@@ -81,19 +81,19 @@
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="jJ5OT3zxO4tT-exIczNe-20" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;מנגנון התראה&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+        <mxCell id="jJ5OT3zxO4tT-exIczNe-20" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;מנגנון התראה&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
           <mxGeometry x="760" y="40" width="160" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="jJ5OT3zxO4tT-exIczNe-22" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;אינטגרציה מלאה&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+        <mxCell id="jJ5OT3zxO4tT-exIczNe-22" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;אינטגרציה מלאה&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
           <mxGeometry x="1000" y="160" width="160" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="jJ5OT3zxO4tT-exIczNe-26" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;מצגת אמצע&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+        <mxCell id="jJ5OT3zxO4tT-exIczNe-26" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;מצגת אמצע&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
           <mxGeometry x="280" y="520" width="160" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="jJ5OT3zxO4tT-exIczNe-27" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;סמינר פרויקט (מצגת סיום)&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+        <mxCell id="jJ5OT3zxO4tT-exIczNe-27" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;סמינר פרויקט (מצגת סיום)&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
           <mxGeometry x="520" y="520" width="160" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="jJ5OT3zxO4tT-exIczNe-28" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;דוח טכני + תיעוד&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+        <mxCell id="jJ5OT3zxO4tT-exIczNe-28" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;דוח טכני + תיעוד&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
           <mxGeometry x="760" y="520" width="160" height="80" as="geometry" />
         </mxCell>
       </root>
