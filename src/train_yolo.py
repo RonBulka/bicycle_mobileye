@@ -10,14 +10,14 @@ if __name__ == '__main__':
     else:
         print("No GPU detected. Training will run on the CPU.")
 
-    config_path = './config.yaml'
+    config_path = './dataset/dataset.yaml'
 
     # Load a pre trained model
-    model = YOLO("yolov10n.pt")
+    model = YOLO("yolov8n.pt")
 
     # Set the device to the ROCm-supported GPU
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model.to(device)
 
     # train the model
-    model.train(data=config_path, epochs=200, batch=32)
+    model.train(data=config_path, epochs=200, batch=32, imgsz=640, device=device, project="./runs")
