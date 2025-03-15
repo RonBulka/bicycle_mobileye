@@ -3,6 +3,10 @@ import os
 import torch
 from ultralytics import YOLO
 
+EPOCHS = 200
+BATCH_SIZE = 32
+IMAGE_SIZE = 640
+
 if __name__ == '__main__':
     print(f"Is CUDA available? {torch.cuda.is_available()}")
     if torch.cuda.is_available():
@@ -20,4 +24,4 @@ if __name__ == '__main__':
     model.to(device)
 
     # train the model
-    model.train(data=config_path, epochs=200, batch=32, imgsz=640, device=device, project="./runs")
+    model.train(data=config_path, epochs=EPOCHS, batch=BATCH_SIZE, imgsz=IMAGE_SIZE, device=device, project="./runs")

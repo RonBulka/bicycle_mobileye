@@ -5,7 +5,6 @@ import cv2
 import depthai as dai
 import numpy as np
 import time
-import msvcrt
 
 # Current working directory
 cwd = os.getcwd()
@@ -19,6 +18,8 @@ OUTPUT_VIDEO = "vid_result/test_video.mp4"
 
 # Camera preview dimensions
 CAMERA_PREVIEW_DIM = (640, 640)
+# CAMERA_PREVIEW_DIM = (960, 960)
+# CAMERA_PREVIEW_DIM = (1280, 1280)
 
 # Labels for detected objects
 LABELS = ["Vehicle"]
@@ -141,9 +142,17 @@ with dai.Device(pipeline) as device:
                 elapsed_time = time.time() - start_time
                 fps = frame_count / elapsed_time
                 
-                if msvcrt.kbhit():
-                    if msvcrt.getch() == b'q':
-                        break
+                # Display the annotated frame
+                cv2.imshow("Frame", annotated_frame)
+
+                # Exit on key press
+                if cv2.waitKey(1) & 0xFF == ord('q'):
+                    break
+
     finally:
         # Release resources
         out.release()
+    out.release()
+    cv2.destroyAllWindows()
+    
+    
