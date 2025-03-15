@@ -3,28 +3,32 @@ import fiftyone as fo
 import os
 import argparse
 
-def export_only_images(cwd, classes):
+TRAIN_SAMPLES = 4000
+VAL_SAMPLES = 2000
+
+def export_only_images(cwd, label_type, classes, train_samples, val_samples):
     train_output_dir = os.path.join(cwd, "images/train")
     val_output_dir = os.path.join(cwd, "images/val")
-    if not os.path.isdir(train_output_dir) or not os.path.isdir(val_output_dir):
-        print("Output directories do not exist. Please create them first.")
-        return
+    if not os.path.isdir(train_output_dir):
+        os.makedirs(train_output_dir, exist_ok=True)
+    if not os.path.isdir(val_output_dir):
+        os.makedirs(val_output_dir, exist_ok=True)
 
     # Load the datasets
     dataset_train = fo.zoo.load_zoo_dataset(
         "open-images-v7",
         split="train",
-        label_types=["detections"],
+        label_types=[label_type],
         classes=classes,
-        max_samples=1000,
+        max_samples=train_samples,
     )
 
     dataset_val = fo.zoo.load_zoo_dataset(
         "open-images-v7",
         split="validation",
-        label_types=["detections"],
+        label_types=[label_type],
         classes=classes,
-        max_samples=200,
+        max_samples=val_samples,
     )
 
     # Export the images to the folder
@@ -40,21 +44,20 @@ def export_only_images(cwd, classes):
         label_field=None,  # Optional: Exclude labels if not needed
     )
 
-def export_images_and_labels(export_dir, label_type, splits, classes):
-    # Load splits separately with different max_samples
+def export_images_and_labels(export_dir, label_type, splits, classes, train_samples, val_samples):
     dataset = fo.zoo.load_zoo_dataset(
         "open-images-v7",
         splits=["train"],
         label_types=[label_type],
         classes=classes,
-        max_samples=4000,
+        max_samples=train_samples,
     )
     val_dataset = fo.zoo.load_zoo_dataset(
         "open-images-v7",
         splits=["validation"],
         label_types=[label_type],
         classes=classes,
-        max_samples=1000,
+        max_samples=val_samples,
     )
 
     # Combine or process each dataset as needed
@@ -72,7 +75,7 @@ def export_images_and_labels(export_dir, label_type, splits, classes):
     for split in splits:
         split_view = dataset.match_tags([split])
         split_name = "train" if split == "train" else "val"
-        max_samples = 40 if split == "train" else 10
+        max_samples = train_samples if split == "train" else val_samples
         split_view.export(
             export_dir=export_dir,
             dataset_type=fo.types.YOLOv5Dataset,
@@ -85,10 +88,9 @@ def export_images_and_labels(export_dir, label_type, splits, classes):
 def parse_args():
     parser = argparse.ArgumentParser(description="Download and export datasets.")
     parser.add_argument(
-        "--export-type", "-t",
-        choices=["images", "images_and_labels"],
-        required=True,
-        help="Type of export: 'images' or 'images_and_labels'"
+        "--export_labels", "-el",
+        action='store_true',
+        help="Flag to export images and labels"
     )
     parser.add_argument(
         "--label_type", "-l",
@@ -108,12 +110,24 @@ def parse_args():
         default=["Car", "Truck", "Bus", "Motorcycle", "Van", "Ambulance"],
         help="Classes to include in the export (default: ['Car', 'Truck', 'Bus', 'Motorcycle', 'Van', 'Ambulance'])"
     )
+    parser.add_argument(
+        "--train_samples", "-ts",
+        type=int,
+        default=TRAIN_SAMPLES,
+        help="Number of training samples to export"
+    )
+    parser.add_argument(
+        "--val_samples", "-vs",
+        type=int,
+        default=VAL_SAMPLES,
+        help="Number of validation samples to export"
+    )
     return parser.parse_args()
 
 if __name__ == '__main__':
     args = parse_args()
     export_dir = os.path.join(os.getcwd(), "dataset")
-    if args.export_type == "images":
-        export_only_images(export_dir, args.classes)
-    elif args.export_type == "images_and_labels":
-        export_images_and_labels(export_dir, args.label_type, args.splits, args.classes)
+    if not args.export_labels:
+        export_only_images(export_dir, args.label_type, args.classes, args.train_samples, args.val_samples)
+    elif args.export_labels:
+        export_images_and_labels(export_dir, args.label_type, args.splits, args.classes, args.train_samples, args.val_samples)
