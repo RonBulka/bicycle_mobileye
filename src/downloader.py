@@ -41,34 +41,44 @@ def export_only_images(cwd, classes):
     )
 
 def export_images_and_labels(export_dir, label_type, splits, classes):
+    # Load splits separately with different max_samples
     dataset = fo.zoo.load_zoo_dataset(
         "open-images-v7",
-        splits=splits,
+        splits=["train"],
         label_types=[label_type],
         classes=classes,
         max_samples=4000,
     )
+    val_dataset = fo.zoo.load_zoo_dataset(
+        "open-images-v7",
+        splits=["validation"],
+        label_types=[label_type],
+        classes=classes,
+        max_samples=1000,
+    )
+
+    # Combine or process each dataset as needed
+    dataset.add_samples(val_dataset)
 
     # Convert all class labels to "vehicle"
     for sample in dataset:
-        # print(sample)
         detections = sample.ground_truth.detections
         for detection in detections:
             if detection.label in classes:
                 detection.label = "vehicle"
         sample.save()
 
-    # Export with single class
+    # Export separately per split
     for split in splits:
         split_view = dataset.match_tags([split])
         split_name = "train" if split == "train" else "val"
-        max_samples = 2000 if split == "validation" else 4000
+        max_samples = 40 if split == "train" else 10
         split_view.export(
             export_dir=export_dir,
             dataset_type=fo.types.YOLOv5Dataset,
             split=split_name,
             label_field=None,
-            classes=["vehicle"],  # Single class definition
+            classes=["vehicle"],
             max_samples=max_samples,
         )
 
@@ -102,7 +112,7 @@ def parse_args():
 
 if __name__ == '__main__':
     args = parse_args()
-    export_dir = os.path.join(os.getcwd(), "datatest")
+    export_dir = os.path.join(os.getcwd(), "dataset")
     if args.export_type == "images":
         export_only_images(export_dir, args.classes)
     elif args.export_type == "images_and_labels":
