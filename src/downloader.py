@@ -90,13 +90,13 @@ def parse_args():
     parser.add_argument(
         "--export_labels", "-el",
         action='store_true',
-        help="Flag to export images and labels"
+        help="Flag to also export labels"
     )
     parser.add_argument(
         "--label_type", "-l",
         type=str,
         default="detections",
-        help="Label type for exporting images and labels"
+        help="Label type for exporting images and labels (default: 'detections')"
     )
     parser.add_argument(
         "--splits", "-s",
@@ -114,13 +114,13 @@ def parse_args():
         "--train_samples", "-ts",
         type=int,
         default=TRAIN_SAMPLES,
-        help="Number of training samples to export"
+        help=f"Number of training samples to export (default: {TRAIN_SAMPLES})"
     )
     parser.add_argument(
         "--val_samples", "-vs",
         type=int,
         default=VAL_SAMPLES,
-        help="Number of validation samples to export"
+        help=f"Number of validation samples to export (default: {VAL_SAMPLES})"
     )
     return parser.parse_args()
 

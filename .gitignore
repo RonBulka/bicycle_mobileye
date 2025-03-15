@@ -2,3 +2,10 @@
 *.txt
 instructions.sh
 .venv/*
+yolo*
+*.zip
+*.tar.gz
+*.tar
+*.tar.xz
+*.log
+*.bkp
