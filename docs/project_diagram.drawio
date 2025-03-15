@@ -30,7 +30,7 @@
         <mxCell id="jJ5OT3zxO4tT-exIczNe-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="jJ5OT3zxO4tT-exIczNe-3" target="jJ5OT3zxO4tT-exIczNe-18" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="jJ5OT3zxO4tT-exIczNe-3" value="&lt;span style=&quot;&quot; dir=&quot;RTL&quot; lang=&quot;HE&quot;&gt;&lt;font face=&quot;Helvetica&quot; style=&quot;font-size: 18px;&quot;&gt;הגדרת&amp;nbsp; API&lt;/font&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+        <mxCell id="jJ5OT3zxO4tT-exIczNe-3" value="&lt;span style=&quot;&quot; dir=&quot;RTL&quot; lang=&quot;HE&quot;&gt;&lt;font face=&quot;Helvetica&quot; style=&quot;font-size: 18px;&quot;&gt;הגדרת&amp;nbsp; API&lt;/font&gt;&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
           <mxGeometry x="280" y="40" width="160" height="80" as="geometry" />
         </mxCell>
         <mxCell id="jJ5OT3zxO4tT-exIczNe-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="jJ5OT3zxO4tT-exIczNe-4" target="jJ5OT3zxO4tT-exIczNe-5" edge="1">
@@ -63,7 +63,7 @@
         <mxCell id="jJ5OT3zxO4tT-exIczNe-23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="jJ5OT3zxO4tT-exIczNe-14" target="jJ5OT3zxO4tT-exIczNe-22" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="jJ5OT3zxO4tT-exIczNe-14" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;אינטגרציה של המצלמה עם כרטיס הבקרה&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+        <mxCell id="jJ5OT3zxO4tT-exIczNe-14" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;אינטגרציה של המצלמה עם כרטיס הבקרה&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
           <mxGeometry x="520" y="160" width="160" height="80" as="geometry" />
         </mxCell>
         <mxCell id="jJ5OT3zxO4tT-exIczNe-21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="jJ5OT3zxO4tT-exIczNe-18" target="jJ5OT3zxO4tT-exIczNe-20" edge="1">
@@ -87,7 +87,7 @@
         <mxCell id="jJ5OT3zxO4tT-exIczNe-22" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;אינטגרציה מלאה&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
           <mxGeometry x="1000" y="160" width="160" height="80" as="geometry" />
         </mxCell>
-        <mxCell id="jJ5OT3zxO4tT-exIczNe-26" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;מצגת אמצע&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+        <mxCell id="jJ5OT3zxO4tT-exIczNe-26" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;מצגת אמצע&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
           <mxGeometry x="280" y="520" width="160" height="80" as="geometry" />
         </mxCell>
         <mxCell id="jJ5OT3zxO4tT-exIczNe-27" value="&lt;span style=&quot;font-size: 18px;&quot;&gt;סמינר פרויקט (מצגת סיום)&lt;/span&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
