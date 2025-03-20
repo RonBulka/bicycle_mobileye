@@ -25,3 +25,5 @@ if __name__ == '__main__':
 
     # train the model
     model.train(data=config_path, epochs=EPOCHS, batch=BATCH_SIZE, imgsz=IMAGE_SIZE, device=device, project="./runs")
+
+# TODO: add command line arguments to the script
