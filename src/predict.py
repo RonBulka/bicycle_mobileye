@@ -9,18 +9,42 @@ CONFIDENCE_THRESHOLD = 0.7
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Run YOLO object detection on video')
-    parser.add_argument('--model', '-m', type=str, default='./runs/train2/weights/last.pt',
-                        help='Path to YOLO model weights')
-    parser.add_argument('--input_dir', '-id', type=str, default='./evaluation_vids/input/',
-                        help='Path to input video directory')
-    parser.add_argument('--output_dir', '-od', type=str, default='./evaluation_vids/output/',
-                        help='Path to output video directory')
-    parser.add_argument('--input_name', '-in', type=str, default='4p9Zk12iE8s.mp4',
-                        help='Name of input video')
-    parser.add_argument('--output_name', '-on', type=str, default='out.mp4',
-                        help='Name of output video')
-    parser.add_argument('--confidence', '-c', type=float, default=CONFIDENCE_THRESHOLD,
-                        help='Confidence threshold for object detection')
+    parser.add_argument(
+        '--model', '-m',
+        type=str,
+        default='./runs/train2/weights/last.pt',
+        help='Path to YOLO model weights'
+    )
+    parser.add_argument(
+        '--input_dir', '-id',
+        type=str,
+        default='./evaluation_vids/input/',
+        help='Path to input video directory'
+    )
+    parser.add_argument(
+        '--output_dir', '-od',
+        type=str,
+        default='./evaluation_vids/output/',
+        help='Path to output video directory'
+    )
+    parser.add_argument(
+        '--input_name', '-in',
+        type=str,
+        default='4p9Zk12iE8s.mp4',
+        help='Name of input video'
+    )
+    parser.add_argument(
+        '--output_name', '-on',
+        type=str,
+        default='out.mp4',
+        help='Name of output video'
+    )
+    parser.add_argument(
+        '--confidence', '-c',
+        type=float,
+        default=CONFIDENCE_THRESHOLD,
+        help='Confidence threshold for object detection'
+    )
     return parser.parse_args()
 
 def main(args):
