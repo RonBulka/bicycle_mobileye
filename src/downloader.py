@@ -4,7 +4,7 @@ import os
 import argparse
 
 TRAIN_SAMPLES = 4000
-VAL_SAMPLES = 2000
+VAL_SAMPLES = 1000
 
 def export_only_images(cwd, label_type, classes, train_samples, val_samples):
     train_output_dir = os.path.join(cwd, "images/train")
