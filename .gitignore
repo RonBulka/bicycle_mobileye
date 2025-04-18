@@ -1,13 +1,12 @@
-*.jpg
 *.txt
 *.cache
 instructions.sh
 .venv/*
-yolo*
+dataset/*
+yolo*.pt
 *.zip
 *.tar.gz
 *.tar
 *.tar.xz
-*.log
 *.bkp
 *.dtmp
