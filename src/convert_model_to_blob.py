@@ -12,7 +12,7 @@ onnx_name = 'model.onnx'
 img_size = 640  # Image size
 
 # Define paths
-model_dir = os.path.join(os.getcwd(), 'runs/detect/train5/weights/')
+model_dir = os.path.join(os.getcwd(), 'runs/yolov8n_640sz_6000t_1500v')
 onnx_path = os.path.join(model_dir, onnx_name)
 output_dir = os.path.join(model_dir, "openvino")
 xml_path = os.path.join(output_dir, "model.xml")

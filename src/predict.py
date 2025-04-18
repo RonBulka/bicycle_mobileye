@@ -12,7 +12,7 @@ def parse_args():
     parser.add_argument(
         '--model', '-m',
         type=str,
-        default='./runs/train2/weights/last.pt',
+        default='./runs/yolov8n_640sz_6000t_1500v/weights/last.pt',
         help='Path to YOLO model weights'
     )
     parser.add_argument(
