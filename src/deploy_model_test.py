@@ -24,6 +24,9 @@ CAMERA_PREVIEW_DIM = (640, 640)
 # Labels for detected objects
 LABELS = ["Vehicle"]
 
+# Confidence threshold
+CONFIDENCE_THRESHOLD = 0.7
+
 def load_config(config_path):
     """Loads configuration from a JSON file."""
     with open(config_path) as f:
@@ -90,10 +93,11 @@ def annotate_frame(frame, detections, fps):
     """Annotates a frame with detections and FPS."""
     color = (0, 0, 255)
     for detection in detections:
-        bbox = frame_norm(frame, (detection.xmin, detection.ymin, detection.xmax, detection.ymax))
-        cv2.putText(frame, LABELS[detection.label], (bbox[0] + 10, bbox[1] + 25), cv2.FONT_HERSHEY_TRIPLEX, 1, color)
-        cv2.putText(frame, f"{int(detection.confidence * 100)}%", (bbox[0] + 10, bbox[1] + 60), cv2.FONT_HERSHEY_TRIPLEX, 1, color)
-        cv2.rectangle(frame, (bbox[0], bbox[1]), (bbox[2], bbox[3]), color, 2)
+        if (detection.confidence > CONFIDENCE_THRESHOLD):
+            bbox = frame_norm(frame, (detection.xmin, detection.ymin, detection.xmax, detection.ymax))
+            cv2.putText(frame, LABELS[detection.label], (bbox[0] + 10, bbox[1] + 25), cv2.FONT_HERSHEY_TRIPLEX, 1, color)
+            cv2.putText(frame, f"{int(detection.confidence * 100)}%", (bbox[0] + 10, bbox[1] + 60), cv2.FONT_HERSHEY_TRIPLEX, 1, color)
+            cv2.rectangle(frame, (bbox[0], bbox[1]), (bbox[2], bbox[3]), color, 2)
 
     # Annotate the frame with the FPS
     cv2.putText(frame, f"FPS: {fps:.2f}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
