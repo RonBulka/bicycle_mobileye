@@ -62,15 +62,11 @@ if __name__ == '__main__':
     # Load a pre trained model
     model = YOLO(args.model)
 
-    # Set the device to the ROCm-supported GPU
-    device = "cuda" if torch.cuda.is_available() else "cpu"
-    model.to(device)
-
     # train the model
-    model.train(data=args.config,
-                epochs=args.epochs,
-                batch=args.batch,
-                imgsz=args.imgsz,
-                device=device,
-                project=args.output
+    model.train(
+        data=args.config,
+        epochs=args.epochs,
+        batch=args.batch,
+        imgsz=args.imgsz,
+        project=args.output
     )
