@@ -4,8 +4,7 @@ import argparse
 import cv2
 import torch
 from ultralytics import  YOLO
-
-CONFIDENCE_THRESHOLD = 0.7
+from constansts import CONFIDENCE_THRESHOLD
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Run YOLO object detection on video')
