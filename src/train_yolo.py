@@ -2,13 +2,7 @@
 import torch
 import argparse
 from ultralytics import YOLO
-
-EPOCHS      = 200
-BATCH_SIZE  = 32
-IMAGE_SIZE  = 640
-CONFIG      = './dataset/dataset.yaml'
-MODEL       = 'yolov8n.pt'
-OUTPUT_DIR  = './runs'
+from constansts import EPOCHS, BATCH_SIZE, IMAGE_SIZE, CONFIG, MODEL, OUTPUT_DIR
 
 # add args to the script
 def parse_args():

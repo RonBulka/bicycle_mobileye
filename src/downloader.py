@@ -2,9 +2,7 @@
 import fiftyone as fo
 import os
 import argparse
-
-TRAIN_SAMPLES = 6000
-VAL_SAMPLES = 1500
+from constansts import TRAIN_SAMPLES, VAL_SAMPLES
 
 def export_only_images(cwd, label_type, classes, train_samples, val_samples):
     train_output_dir = os.path.join(cwd, "images/train")

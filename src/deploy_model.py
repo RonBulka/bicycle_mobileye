@@ -3,9 +3,11 @@ import os
 import json
 import cv2
 import depthai as dai
-import numpy as np
 import time
+import argparse
 import msvcrt
+from vehicle_tracker import VehicleTracker, annotate_frame
+from constansts import CAMERA_PREVIEW_DIM
 
 # Current working directory
 cwd = os.getcwd()
@@ -16,21 +18,6 @@ YOLO_CONFIG = os.path.join(cwd, "luxonis_output/last.json")
 
 # Input and output video paths
 OUTPUT_VIDEO = "vid_result/test_video.mp4"
-
-# Camera preview dimensions
-CAMERA_PREVIEW_DIM = (640, 640)
-
-# Labels for detected objects
-LABELS = ["Vehicle"]
-
-# Confidence threshold
-CONFIDENCE_THRESHOLD = 0.7
-
-def load_config(config_path):
-    """Loads configuration from a JSON file."""
-    with open(config_path) as f:
-        return json.load(f)
-
 def create_camera_pipeline(config_path, model_path):
     """Creates a pipeline for the camera and YOLO detection."""
     pipeline = dai.Pipeline()
@@ -77,77 +64,86 @@ def create_camera_pipeline(config_path, model_path):
 
     return pipeline
 
-def to_planar(arr: np.ndarray, shape: tuple) -> np.ndarray:
-    """Resizes an array to a specified shape and transposes it."""
-    resized = cv2.resize(arr, shape)
-    return resized.transpose(2, 0, 1)
+def load_config(config_path):
+    """Loads configuration from a JSON file."""
+    with open(config_path) as f:
+        return json.load(f)
 
-def frame_norm(frame, bbox):
-    """Normalizes bounding box coordinates to frame dimensions."""
-    norm_vals = np.full(len(bbox), frame.shape[0])
-    norm_vals[::2] = frame.shape[1]
-    return (np.clip(np.array(bbox), 0, 1) * norm_vals).astype(int)
+def main(args):
+    # Create pipeline
+    pipeline = create_camera_pipeline(YOLO_CONFIG, YOLO_MODEL)
 
-def annotate_frame(frame, detections, fps):
-    """Annotates a frame with detections and FPS."""
-    color = (0, 0, 255)
-    for detection in detections:
-        if (detection.confidence > CONFIDENCE_THRESHOLD):
-            bbox = frame_norm(frame, (detection.xmin, detection.ymin, detection.xmax, detection.ymax))
-            cv2.putText(frame, LABELS[detection.label], (bbox[0] + 10, bbox[1] + 25), cv2.FONT_HERSHEY_TRIPLEX, 1, color)
-            cv2.putText(frame, f"{int(detection.confidence * 100)}%", (bbox[0] + 10, bbox[1] + 60), cv2.FONT_HERSHEY_TRIPLEX, 1, color)
-            cv2.rectangle(frame, (bbox[0], bbox[1]), (bbox[2], bbox[3]), color, 2)
+    # Initialize vehicle tracker
+    vehicle_tracker = VehicleTracker()
 
-    # Annotate the frame with the FPS
-    cv2.putText(frame, f"FPS: {fps:.2f}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-    return frame
+    # Connect to device and start pipeline
+    with dai.Device(pipeline) as device:
+        # Define the queues that will be used to receive the neural network output and video frames
+        detectionNN = device.getOutputQueue("nn", maxSize=4, blocking=False)
+        videoQueue = device.getOutputQueue("video", maxSize=4, blocking=False)
 
-# Create pipeline
-pipeline = create_camera_pipeline(YOLO_CONFIG, YOLO_MODEL)
+        # Video writer to save the output video
+        fps = 15  # Assuming 15 FPS for the OAK-D camera
+        frame_width, frame_height = CAMERA_PREVIEW_DIM
 
-# Connect to device and start pipeline
-with dai.Device(pipeline) as device:
-    # Define the queues that will be used to receive the neural network output and video frames
-    detectionNN = device.getOutputQueue("nn", maxSize=4, blocking=False)
-    videoQueue = device.getOutputQueue("video", maxSize=4, blocking=False)
+        fourcc = cv2.VideoWriter_fourcc(*'MP4V')
+        out = cv2.VideoWriter(OUTPUT_VIDEO, fourcc, fps, (frame_width, frame_height))
 
-    # Video writer to save the output video
-    fps = 15  # Assuming 15 FPS for the OAK-D camera
-    frame_width, frame_height = CAMERA_PREVIEW_DIM
+        start_time = time.time()
+        frame_count = 0
 
-    fourcc = cv2.VideoWriter_fourcc(*'MP4V')
-    out = cv2.VideoWriter(OUTPUT_VIDEO, fourcc, fps, (frame_width, frame_height))
+        try:
+            while True:
+                inDet = detectionNN.get()
+                detections = []
+                if inDet is not None:
+                    detections = inDet.detections
 
-    start_time = time.time()
-    frame_count = 0
+                # Retrieve the frame from the camera preview
+                inVideo = videoQueue.get()
+                if inVideo is not None:
+                    frame = inVideo.getCvFrame()
 
-    try:
-        while True:
-            inDet = detectionNN.get()
-            detections = []
-            if inDet is not None:
-                detections = inDet.detections
-                print("Detections", detections)
+                    # Update vehicle tracking
+                    tracked_vehicles = vehicle_tracker.update(detections, frame.shape[:2])
 
-            # Retrieve the frame from the camera preview
-            inVideo = videoQueue.get()
-            if inVideo is not None:
-                frame = inVideo.getCvFrame()  # Use getCvFrame for OpenCV format
+                    # Annotate the frame with tracked vehicles
+                    annotated_frame = annotate_frame(frame, tracked_vehicles, fps)
 
-                # Annotate the frame with detections
-                annotated_frame = annotate_frame(frame, detections, fps)
+                    # Write the annotated frame to the output video
+                    out.write(annotated_frame)
 
-                # Write the annotated frame to the output video
-                out.write(annotated_frame)
+                    # Update frame count and calculate FPS
+                    frame_count += 1
+                    elapsed_time = time.time() - start_time
+                    fps = frame_count / elapsed_time
+                    
+                    if args.test:
+                        # Display the annotated frame
+                        cv2.imshow("Frame", annotated_frame)
+                        # Exit on key press
+                        if cv2.waitKey(1) & 0xFF == ord('q'):
+                            break
+                    else:
+                        if msvcrt.kbhit():
+                            if msvcrt.getch() == b'q':
+                                break
 
-                # Update frame count and calculate FPS
-                frame_count += 1
-                elapsed_time = time.time() - start_time
-                fps = frame_count / elapsed_time
-                
-                if msvcrt.kbhit():
-                    if msvcrt.getch() == b'q':
-                        break
-    finally:
-        # Release resources
-        out.release()
+        finally:
+            # Release resources
+            out.release()
+            if args.test:
+                cv2.destroyAllWindows()
+
+def parse_args():
+    parser = argparse.ArgumentParser(description="Deploy model on OAK-D lite camera")
+    parser.add_argument(
+        "--test", "-t",
+        action='store_true',
+        help="Flag to run in test mode"
+    )
+    return parser.parse_args()
+
+if __name__ == "__main__":
+    args = parse_args()
+    main(args)
