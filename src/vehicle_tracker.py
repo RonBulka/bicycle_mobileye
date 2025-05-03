@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Tuple, List, Dict
+from typing import Tuple, List, Dict, Protocol
 from collections import deque
 import time
 import numpy as np
@@ -11,6 +11,24 @@ from constansts import  CONFIDENCE_THRESHOLD, \
                         SPEED_THRESHOLD, \
                         TTC_THRESHOLD, \
                         IOU_THRESHOLD
+
+class DetectionProtocol(Protocol):
+    """Protocol defining the required attributes for detection objects.
+    
+    Any object passed to the tracker must have these attributes:
+    - xmin: float - normalized x coordinate of top-left corner (0-1)
+    - ymin: float - normalized y coordinate of top-left corner (0-1)
+    - xmax: float - normalized x coordinate of bottom-right corner (0-1)
+    - ymax: float - normalized y coordinate of bottom-right corner (0-1)
+    - confidence: float - detection confidence score (0-1)
+    - label: int - class label of the detection
+    """
+    xmin: float
+    ymin: float
+    xmax: float
+    ymax: float
+    confidence: float
+    label: int
 
 @dataclass
 class TrackedVehicle:
@@ -52,8 +70,19 @@ class VehicleTracker:
             ttc = float('inf')
         return speed, ttc
 
-    def update(self, detections: List, frame_shape: Tuple[int, int]) -> List[TrackedVehicle]:
-        """Update tracked vehicles with new detections."""
+    def update(self, detections: List[DetectionProtocol], frame_shape: np.ndarray) -> List[TrackedVehicle]:
+        """Update tracked vehicles with new detections.
+        
+        Args:
+            detections: List of detection objects. Each detection must have:
+                - xmin, ymin, xmax, ymax: normalized coordinates (0-1)
+                - confidence: detection confidence score (0-1)
+                - label: class label
+            frame_shape: Tuple of (height, width) of the frame
+            
+        Returns:
+            List of currently tracked vehicles
+        """
         current_time = time.time()
         self.frame_count += 1
 
@@ -130,13 +159,13 @@ class VehicleTracker:
 
         return intersection / union if union > 0 else 0
 
-def frame_norm(frame, bbox):
+def frame_norm(frame: np.ndarray, bbox: Tuple[int, int, int, int]) -> Tuple[int, int, int, int]:
     """Normalizes bounding box coordinates to frame dimensions."""
     norm_vals = np.full(len(bbox), frame.shape[0])
     norm_vals[::2] = frame.shape[1]
     return (np.clip(np.array(bbox), 0, 1) * norm_vals).astype(int)
 
-def annotate_frame(frame, tracked_vehicles, fps):
+def annotate_frame(frame: np.ndarray, tracked_vehicles: List[TrackedVehicle], fps: float) -> np.ndarray:
     """Annotates a frame with tracked vehicles and their metrics."""
     color = (0, 0, 255)
     for vehicle in tracked_vehicles:
@@ -146,19 +175,19 @@ def annotate_frame(frame, tracked_vehicles, fps):
 
         # Add vehicle ID and metrics
         text = f"ID: {vehicle.id}"
-        cv2.putText(frame, text, (bbox[0] + 10, bbox[1] + 25), cv2.FONT_HERSHEY_TRIPLEX, 1, color)
+        cv2.putText(frame, text, (bbox[0] + 10, bbox[1] + 25), cv2.FONT_HERSHEY_TRIPLEX, 0.3, color)
 
         # Add speed and TTC
         speed_text = f"Speed: {vehicle.speed:.1f}%"
         ttc_text = f"TTC: {vehicle.ttc:.1f}s"
-        cv2.putText(frame, speed_text, (bbox[0] + 10, bbox[1] + 60), cv2.FONT_HERSHEY_TRIPLEX, 1, color)
-        cv2.putText(frame, ttc_text, (bbox[0] + 10, bbox[1] + 95), cv2.FONT_HERSHEY_TRIPLEX, 1, color)
+        cv2.putText(frame, speed_text, (bbox[0] + 10, bbox[1] + 60), cv2.FONT_HERSHEY_TRIPLEX, 0.3, color)
+        cv2.putText(frame, ttc_text, (bbox[0] + 10, bbox[1] + 95), cv2.FONT_HERSHEY_TRIPLEX, 0.3, color)
 
         # Add warning if vehicle is approaching too fast
         if vehicle.ttc < TTC_THRESHOLD and vehicle.speed > SPEED_THRESHOLD:
             warning_text = "WARNING: Approaching vehicle!"
             cv2.putText(frame, warning_text, (10, frame.shape[0] - 30), 
-                       cv2.FONT_HERSHEY_TRIPLEX, 1, color, 2)
+                       cv2.FONT_HERSHEY_TRIPLEX, 0.3, color, 2)
 
     # Annotate the frame with the FPS
     cv2.putText(frame, f"FPS: {fps:.2f}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)

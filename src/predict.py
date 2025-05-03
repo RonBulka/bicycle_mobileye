@@ -3,8 +3,10 @@ import os
 import argparse
 import cv2
 import torch
-from ultralytics import  YOLO
+from ultralytics import YOLO
+from vehicle_tracker import VehicleTracker, annotate_frame
 from constansts import CONFIDENCE_THRESHOLD
+import time
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Run YOLO object detection on video')
@@ -44,7 +46,85 @@ def parse_args():
         default=CONFIDENCE_THRESHOLD,
         help='Confidence threshold for object detection'
     )
+    parser.add_argument(
+        '--test', '-t',
+        action='store_true',
+        help='Flag to run in test mode with visualization'
+    )
+    parser.add_argument(
+        '--play', '-p',
+        action='store_true',
+        help='Play the output video after processing'
+    )
     return parser.parse_args()
+
+class YOLODetection:
+    """Wrapper class to make YOLO detection results compatible with our tracker"""
+    def __init__(self, x1: float, y1: float, x2: float, y2: float, confidence: float, class_id: int):
+        self.xmin = x1
+        self.ymin = y1
+        self.xmax = x2
+        self.ymax = y2
+        self.confidence = confidence
+        self.label = class_id
+
+def play_video(video_path: str):
+    """Play a video file using OpenCV with X11 forwarding support."""
+    cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        print(f"Error: Could not open video file {video_path}")
+        return
+
+    # Get video properties
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    frame_delay = int(1000/fps)  # Delay between frames in milliseconds
+
+    print("\nVideo playback controls:")
+    print("Press 'q' to quit")
+    print("Press 'space' to pause/resume")
+    print("Press 'r' to restart video")
+    print("Press 'f' to toggle fullscreen")
+    print("\nPlaying video...")
+
+    paused = False
+    fullscreen = False
+    window_name = 'Processed Video'
+
+    while True:
+        if not paused:
+            ret, frame = cap.read()
+            if not ret:
+                # Restart video when it ends
+                cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+                continue
+
+            # Resize frame for better performance over X11
+            height, width = frame.shape[:2]
+            scale = min(1.0, 1280/width)  # Scale down if width > 1280
+            if scale < 1.0:
+                new_width = int(width * scale)
+                new_height = int(height * scale)
+                frame = cv2.resize(frame, (new_width, new_height))
+
+            # Show frame
+            cv2.imshow(window_name, frame)
+
+        key = cv2.waitKey(frame_delay) & 0xFF
+        if key == ord('q'):
+            break
+        elif key == ord(' '):
+            paused = not paused
+        elif key == ord('r'):
+            cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+        elif key == ord('f'):
+            fullscreen = not fullscreen
+            if fullscreen:
+                cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
+            else:
+                cv2.setWindowProperty(window_name, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_NORMAL)
+
+    cap.release()
+    cv2.destroyAllWindows()
 
 def main(args):
     # Load the YOLOv8 model using command line argument
@@ -68,8 +148,12 @@ def main(args):
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Codec
     out_video = cv2.VideoWriter(output_video_path, fourcc, fps, (frame_width, frame_height))
 
+    # Initialize vehicle tracker
+    vehicle_tracker = VehicleTracker()
+
     # Iterate over each frame
     frame_count = 0
+    start_time = time.time()
     while video_capture.isOpened():
         ret, frame = video_capture.read()  # Read a frame
         if not ret:
@@ -78,29 +162,48 @@ def main(args):
         # Apply YOLOv8 object detection
         results = model(frame)[0]
 
-        # Iterate through the detections and draw bounding boxes
-        for result in results.boxes.data.tolist():  # Each detection in the format [x1, y1, x2, y2, conf, class]
+        # Convert YOLO detections to our format
+        detections = []
+        for result in results.boxes.data.tolist():
             x1, y1, x2, y2, conf, cls = result[:6]
-            label = f'{model.names[cls]} {conf:.2f}'
+            if conf > args.confidence:
+                # Normalize coordinates to [0,1] range
+                x1, x2 = x1 / frame_width, x2 / frame_width
+                y1, y2 = y1 / frame_height, y2 / frame_height
+                detections.append(YOLODetection(x1, y1, x2, y2, conf, int(cls)))
 
-            # Draw bounding box and label on the frame
-            if conf > args.confidence: 
-                    cv2.rectangle(frame, (int(x1), int(y1)), (int(x2), int(y2)), (0, 0, 255), 2)  # Bounding box
-            # cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
+        # Update vehicle tracking
+        tracked_vehicles = vehicle_tracker.update(detections, frame)
+
+        # Annotate the frame with tracked vehicles
+        annotated_frame = annotate_frame(frame, tracked_vehicles, fps)
 
         # Write the processed frame to the output video
-        out_video.write(frame)
+        out_video.write(annotated_frame)
+
+        # Display frame if in test mode
+        if args.test:
+            cv2.imshow('Frame', annotated_frame)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
 
         # Print progress
         frame_count += 1
-        print(f'Processed frame {frame_count}/{total_frames}')
+        elapsed_time = time.time() - start_time
+        current_fps = frame_count / elapsed_time
+        print(f'Processed frame {frame_count}/{total_frames} (FPS: {current_fps:.2f})')
 
     # Release resources
     video_capture.release()
     out_video.release()
-    cv2.destroyAllWindows()
+    if args.test:
+        cv2.destroyAllWindows()
 
     print(f'Output video saved to {output_video_path}')
+
+    # Play the output video if requested
+    if args.play:
+        play_video(output_video_path)
 
 if __name__ == "__main__":
     args = parse_args()
