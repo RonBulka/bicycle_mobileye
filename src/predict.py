@@ -31,13 +31,13 @@ def parse_args():
     parser.add_argument(
         '--input_name', '-in',
         type=str,
-        default='4p9Zk12iE8s.mp4',
+        default='input1.mp4',
         help='Name of input video'
     )
     parser.add_argument(
         '--output_name', '-on',
         type=str,
-        default='out.mp4',
+        default='out1.mp4',
         help='Name of output video'
     )
     parser.add_argument(
@@ -191,6 +191,7 @@ def main(args):
         frame_count += 1
         elapsed_time = time.time() - start_time
         current_fps = frame_count / elapsed_time
+        fps = current_fps
         print(f'Processed frame {frame_count}/{total_frames} (FPS: {current_fps:.2f})')
 
     # Release resources

@@ -10,7 +10,8 @@ from constansts import  CONFIDENCE_THRESHOLD, \
                         REMOVE_TIME, \
                         SPEED_THRESHOLD, \
                         TTC_THRESHOLD, \
-                        IOU_THRESHOLD
+                        IOU_THRESHOLD, \
+                        WARNING_STICKY_TIME
 
 class DetectionProtocol(Protocol):
     """Protocol defining the required attributes for detection objects.
@@ -40,6 +41,8 @@ class TrackedVehicle:
     last_update: float
     speed: float = 0.0
     ttc: float = float('inf')  # Time to collision in seconds
+    warning: bool = False
+    count_warning: int = 0
 
 class VehicleTracker:
     def __init__(self, max_history: int = MAX_HISTORY, size_threshold: float = SIZE_THRESHOLD):
@@ -58,6 +61,9 @@ class VehicleTracker:
         current_size = vehicle.size_history[-1]
         prev_size = vehicle.size_history[-2]
         size_change = (current_size - prev_size) / prev_size
+
+        if size_change < 0:
+            size_change = 0
 
         # Calculate speed based on size change
         speed = size_change * 100  # Convert to percentage
@@ -130,6 +136,21 @@ class VehicleTracker:
                     best_match.size_history.popleft()
                 if len(best_match.position_history) > self.max_history:
                     best_match.position_history.popleft()
+
+                # Check for warning condition
+                if best_match.speed > SPEED_THRESHOLD and best_match.ttc < TTC_THRESHOLD:
+                    if not best_match.warning:
+                        best_match.warning = True
+                        best_match.count_warning = current_time
+                    else: # Reset warning counter
+                        best_match.count_warning = current_time
+
+                # Check for sticky warning
+                if best_match.warning:
+                    if current_time - best_match.count_warning > WARNING_STICKY_TIME:
+                        best_match.warning = False
+                        best_match.count_warning = 0
+
             else:  # Create new track
                 new_vehicle = TrackedVehicle(
                     id=self.next_id,
@@ -173,22 +194,53 @@ def annotate_frame(frame: np.ndarray, tracked_vehicles: List[TrackedVehicle], fp
         # Draw bounding box
         cv2.rectangle(frame, (bbox[0], bbox[1]), (bbox[2], bbox[3]), color, 2)
 
-        # Add vehicle ID and metrics
-        text = f"ID: {vehicle.id}"
-        cv2.putText(frame, text, (bbox[0] + 10, bbox[1] + 25), cv2.FONT_HERSHEY_TRIPLEX, 0.3, color)
-
-        # Add speed and TTC
-        speed_text = f"Speed: {vehicle.speed:.1f}%"
-        ttc_text = f"TTC: {vehicle.ttc:.1f}s"
-        cv2.putText(frame, speed_text, (bbox[0] + 10, bbox[1] + 60), cv2.FONT_HERSHEY_TRIPLEX, 0.3, color)
-        cv2.putText(frame, ttc_text, (bbox[0] + 10, bbox[1] + 95), cv2.FONT_HERSHEY_TRIPLEX, 0.3, color)
+        # Compose info text
+        info_text = f"ID: {vehicle.id} | Speed: {vehicle.speed:.1f}% | TTC: {vehicle.ttc:.1f}s"
+        # Calculate text size for background
+        (text_width, text_height), baseline = cv2.getTextSize(info_text, cv2.FONT_HERSHEY_TRIPLEX, 0.3, 1)
+        # Draw background rectangle for text
+        cv2.rectangle(
+            frame,
+            (bbox[0], bbox[1] - text_height - baseline - 4),
+            (bbox[0] + text_width, bbox[1]),
+            (255, 255, 255),
+            -1
+        )
+        # Draw info text above the bbox
+        cv2.putText(
+            frame,
+            info_text,
+            (bbox[0], bbox[1] - 4),
+            cv2.FONT_HERSHEY_TRIPLEX,
+            0.3,
+            color,
+            1,
+            cv2.LINE_AA
+        )
 
         # Add warning if vehicle is approaching too fast
-        if vehicle.ttc < TTC_THRESHOLD and vehicle.speed > SPEED_THRESHOLD:
+        if vehicle.warning:
             warning_text = "WARNING: Approaching vehicle!"
-            cv2.putText(frame, warning_text, (10, frame.shape[0] - 30), 
-                       cv2.FONT_HERSHEY_TRIPLEX, 0.3, color, 2)
+            # Calculate center of bbox
+            center_x = (bbox[0] + bbox[2]) // 2
+            center_y = (bbox[1] + bbox[3]) // 2
+            # Get text size
+            (warn_width, warn_height), warn_baseline = cv2.getTextSize(warning_text, cv2.FONT_HERSHEY_TRIPLEX, 0.5, 2)
+            # Calculate bottom-left corner for centered text
+            warn_x = center_x - warn_width // 2
+            warn_y = center_y + warn_height // 2
+            # Draw warning text
+            cv2.putText(
+                frame,
+                warning_text,
+                (warn_x, warn_y),
+                cv2.FONT_HERSHEY_TRIPLEX,
+                0.5,
+                (0, 0, 255),
+                2,
+                cv2.LINE_AA
+            )
 
     # Annotate the frame with the FPS
-    cv2.putText(frame, f"FPS: {fps:.2f}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+    cv2.putText(frame, f"FPS: {fps:.2f}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 255, 0), 2)
     return frame
