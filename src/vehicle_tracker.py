@@ -6,12 +6,12 @@ import numpy as np
 import cv2
 from constansts import  CONFIDENCE_THRESHOLD, \
                         MAX_HISTORY, \
-                        SIZE_THRESHOLD, \
                         REMOVE_TIME_FRAME, \
                         SPEED_THRESHOLD, \
                         TTC_THRESHOLD, \
                         IOU_THRESHOLD, \
-                        WARNING_STICKY_TIME_FRAME
+                        WARNING_STICKY_TIME_FRAME, \
+                        METRIC_FRAME_GAP
 
 class DetectionProtocol(Protocol):
     """Protocol defining the required attributes for detection objects.
@@ -36,8 +36,7 @@ class TrackedVehicle:
     id: int
     bbox: Tuple[int, int, int, int]  # xmin, ymin, xmax, ymax
     confidence: float
-    size_history: deque  # Store last N frame sizes
-    position_history: deque  # Store last N frame positions - doesnt seem to be used
+    width_history: deque  # Store last N frame widths
     last_update: float
     speed: float = 0.0
     ttc: float = float('inf')  # Time to collision in seconds
@@ -45,38 +44,34 @@ class TrackedVehicle:
     count_warning: int = 0
 
 class VehicleTracker:
-    def __init__(self, max_history: int = MAX_HISTORY, size_threshold: float = SIZE_THRESHOLD):
+    def __init__(self, max_history: int = MAX_HISTORY):
         self.tracked_vehicles: Dict[int, TrackedVehicle] = {}
         self.next_id = 0
         self.max_history = max_history
-        self.size_threshold = size_threshold
         self.frame_count = 0
         
-    def calculate_vehicle_metrics(self, vehicle: TrackedVehicle) -> Tuple[float, float]:
+    def calculate_vehicle_metrics(self, vehicle: TrackedVehicle, fps: float) -> Tuple[float, float]:
         """Calculate speed and time to collision for a vehicle."""
-        if len(vehicle.size_history) < 2:
+        if len(vehicle.width_history) < METRIC_FRAME_GAP:
             return 0.0, float('inf')
 
-        # Calculate size change rate
-        current_size = vehicle.size_history[-1]
-        prev_size = vehicle.size_history[-2]
-        size_change = (current_size - prev_size) / prev_size
+        # Calculate relative width change
+        current_width, current_frame = vehicle.width_history[-1]
+        prev_width, prev_frame = vehicle.width_history[-METRIC_FRAME_GAP]
+        width_relative_change = (current_width / prev_width)
+        delta_time = (current_frame - prev_frame) / fps
 
-        if size_change < 0:
-            size_change = 0
-
-        # Calculate speed based on size change
-        speed = size_change * 100  # Convert to percentage
+        # Calculate speed based on width change
+        speed = width_relative_change * 100  # Convert to percentage
 
         # Calculate time to collision (TTC)
-        # TTC = current_size / (size_change_rate * current_size)
-        if abs(size_change) > 0.001:  # Avoid division by very small numbers
-            ttc = 1.0 / abs(size_change)
+        if width_relative_change > 1:
+            ttc = delta_time / (width_relative_change - 1)
         else:
             ttc = float('inf')
         return speed, ttc
 
-    def update(self, detections: List[DetectionProtocol], frame_shape: np.ndarray, frame_number: int) -> List[TrackedVehicle]:
+    def update(self, detections: List[DetectionProtocol], frame_shape: np.ndarray, frame_number: int, fps: float) -> List[TrackedVehicle]:
         """Update tracked vehicles with new detections.
         
         Args:
@@ -89,7 +84,6 @@ class VehicleTracker:
         Returns:
             List of currently tracked vehicles
         """
-        # TODO: Change to use frame number instead of time
         current_frame = frame_number
         self.frame_count += 1
 
@@ -101,7 +95,7 @@ class VehicleTracker:
                 continue
 
             # Calculate metrics
-            speed, ttc = self.calculate_vehicle_metrics(vehicle)
+            speed, ttc = self.calculate_vehicle_metrics(vehicle, fps)
             vehicle.speed = speed
             vehicle.ttc = ttc
 
@@ -111,8 +105,7 @@ class VehicleTracker:
                 continue
 
             bbox = frame_norm(frame_shape, (detection.xmin, detection.ymin, detection.xmax, detection.ymax))
-            size = (bbox[2] - bbox[0]) * (bbox[3] - bbox[1])
-            position = (bbox[0] + bbox[2]) / 2  # Center x position - maybe add also center y position
+            width = bbox[2] - bbox[0]
 
             # Find best matching existing track
             best_match = None
@@ -128,15 +121,12 @@ class VehicleTracker:
             if best_match and best_iou > IOU_THRESHOLD:  # Update existing track
                 best_match.bbox = bbox
                 best_match.confidence = detection.confidence
-                best_match.size_history.append(size)
-                best_match.position_history.append(position)
+                best_match.width_history.append((width, current_frame))
                 best_match.last_update = current_frame
 
                 # Keep history at fixed size
-                if len(best_match.size_history) > self.max_history:
-                    best_match.size_history.popleft()
-                if len(best_match.position_history) > self.max_history:
-                    best_match.position_history.popleft()
+                if len(best_match.width_history) > self.max_history:
+                    best_match.width_history.popleft()
 
                 # Check for warning condition
                 if best_match.speed > SPEED_THRESHOLD and best_match.ttc < TTC_THRESHOLD:
@@ -157,8 +147,7 @@ class VehicleTracker:
                     id=self.next_id,
                     bbox=bbox,
                     confidence=detection.confidence,
-                    size_history=deque([size], maxlen=self.max_history),
-                    position_history=deque([position], maxlen=self.max_history),
+                    width_history=deque([(width, current_frame)], maxlen=self.max_history),
                     last_update=current_frame
                 )
                 self.tracked_vehicles[self.next_id] = new_vehicle

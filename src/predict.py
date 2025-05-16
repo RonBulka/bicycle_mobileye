@@ -145,8 +145,14 @@ def main(args):
     total_frames = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
 
     # Define the codec and create VideoWriter object to save output video
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Codec
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # H.264 codec for better compatibility
     out_video = cv2.VideoWriter(output_video_path, fourcc, fps, (frame_width, frame_height))
+    
+    # Check if VideoWriter was initialized successfully
+    if not out_video.isOpened():
+        print(f"Error: Could not create output video file at {output_video_path}")
+        print("Please check if the output directory exists and you have write permissions")
+        return
 
     # Initialize vehicle tracker
     vehicle_tracker = VehicleTracker()
@@ -173,7 +179,7 @@ def main(args):
                 detections.append(YOLODetection(x1, y1, x2, y2, conf, int(cls)))
 
         # Update vehicle tracking
-        tracked_vehicles = vehicle_tracker.update(detections, frame)
+        tracked_vehicles = vehicle_tracker.update(detections, frame, frame_count, fps)
 
         # Annotate the frame with tracked vehicles
         annotated_frame = annotate_frame(frame, tracked_vehicles, fps)
@@ -200,7 +206,15 @@ def main(args):
     if args.test:
         cv2.destroyAllWindows()
 
-    print(f'Output video saved to {output_video_path}')
+    # Verify the output file exists and has content
+    if os.path.exists(output_video_path):
+        file_size = os.path.getsize(output_video_path)
+        if file_size > 0:
+            print(f'Output video saved successfully to {output_video_path} (Size: {file_size/1024/1024:.2f} MB)')
+        else:
+            print(f'Warning: Output video file was created but is empty (0 bytes)')
+    else:
+        print(f'Error: Output video file was not created at {output_video_path}')
 
     # Play the output video if requested
     if args.play:
