@@ -7,11 +7,11 @@ import cv2
 from constansts import  CONFIDENCE_THRESHOLD, \
                         MAX_HISTORY, \
                         SIZE_THRESHOLD, \
-                        REMOVE_TIME, \
+                        REMOVE_TIME_FRAME, \
                         SPEED_THRESHOLD, \
                         TTC_THRESHOLD, \
                         IOU_THRESHOLD, \
-                        WARNING_STICKY_TIME
+                        WARNING_STICKY_TIME_FRAME
 
 class DetectionProtocol(Protocol):
     """Protocol defining the required attributes for detection objects.
@@ -76,7 +76,7 @@ class VehicleTracker:
             ttc = float('inf')
         return speed, ttc
 
-    def update(self, detections: List[DetectionProtocol], frame_shape: np.ndarray) -> List[TrackedVehicle]:
+    def update(self, detections: List[DetectionProtocol], frame_shape: np.ndarray, frame_number: int) -> List[TrackedVehicle]:
         """Update tracked vehicles with new detections.
         
         Args:
@@ -89,13 +89,14 @@ class VehicleTracker:
         Returns:
             List of currently tracked vehicles
         """
-        current_time = time.time()
+        # TODO: Change to use frame number instead of time
+        current_frame = frame_number
         self.frame_count += 1
 
         # Update existing tracks
         for vehicle_id, vehicle in list(self.tracked_vehicles.items()):
             # Remove old tracks
-            if current_time - vehicle.last_update > REMOVE_TIME:  # Remove if not updated for 1 second
+            if current_frame - vehicle.last_update > REMOVE_TIME_FRAME:
                 del self.tracked_vehicles[vehicle_id]
                 continue
 
@@ -129,7 +130,7 @@ class VehicleTracker:
                 best_match.confidence = detection.confidence
                 best_match.size_history.append(size)
                 best_match.position_history.append(position)
-                best_match.last_update = current_time
+                best_match.last_update = current_frame
 
                 # Keep history at fixed size
                 if len(best_match.size_history) > self.max_history:
@@ -141,13 +142,13 @@ class VehicleTracker:
                 if best_match.speed > SPEED_THRESHOLD and best_match.ttc < TTC_THRESHOLD:
                     if not best_match.warning:
                         best_match.warning = True
-                        best_match.count_warning = current_time
+                        best_match.count_warning = current_frame
                     else: # Reset warning counter
-                        best_match.count_warning = current_time
+                        best_match.count_warning = current_frame
 
                 # Check for sticky warning
                 if best_match.warning:
-                    if current_time - best_match.count_warning > WARNING_STICKY_TIME:
+                    if current_frame - best_match.count_warning > WARNING_STICKY_TIME_FRAME:
                         best_match.warning = False
                         best_match.count_warning = 0
 
@@ -158,7 +159,7 @@ class VehicleTracker:
                     confidence=detection.confidence,
                     size_history=deque([size], maxlen=self.max_history),
                     position_history=deque([position], maxlen=self.max_history),
-                    last_update=current_time
+                    last_update=current_frame
                 )
                 self.tracked_vehicles[self.next_id] = new_vehicle
                 self.next_id += 1
