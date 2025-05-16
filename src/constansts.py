@@ -1,12 +1,12 @@
 # Constants
-CONFIDENCE_THRESHOLD = 0.7
-MAX_HISTORY = 10
-REMOVE_TIME_FRAME = 10
-SPEED_THRESHOLD = 5.0
-TTC_THRESHOLD = 3.0
-IOU_THRESHOLD = 0.3
-WARNING_STICKY_TIME_FRAME = 10
-METRIC_FRAME_GAP = 3
+CONFIDENCE_THRESHOLD = 0.7      # Threshold to determine if a detection is valid
+MAX_HISTORY = 10                # Maximum number entries in history
+REMOVE_TIME_FRAME = 8           # Number of frames to remove a vehicle
+SPEED_THRESHOLD = 5.0           # Speed threshold to determine if a vehicle is fast
+TTC_THRESHOLD = 2.0             # Time to collision threshold to determine if a vehicle is dangerous
+IOU_THRESHOLD = 0.3             # Threshold to determine if a detection is a match
+WARNING_STICKY_TIME_FRAME = 10  # Number of frames to show a warning
+METRIC_HISTORY_GAP = 2          # Number of frames to skip for metrics
 
 # Camera dimensions
 CAMERA_PREVIEW_DIM = (640, 640)

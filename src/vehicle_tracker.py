@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from typing import Tuple, List, Dict, Protocol
 from collections import deque
-import time
 import numpy as np
 import cv2
 from constansts import  CONFIDENCE_THRESHOLD, \
@@ -11,7 +10,7 @@ from constansts import  CONFIDENCE_THRESHOLD, \
                         TTC_THRESHOLD, \
                         IOU_THRESHOLD, \
                         WARNING_STICKY_TIME_FRAME, \
-                        METRIC_FRAME_GAP
+                        METRIC_HISTORY_GAP
 
 class DetectionProtocol(Protocol):
     """Protocol defining the required attributes for detection objects.
@@ -37,6 +36,7 @@ class TrackedVehicle:
     bbox: Tuple[int, int, int, int]  # xmin, ymin, xmax, ymax
     confidence: float
     width_history: deque  # Store last N frame widths
+    momentary_ttc_history: deque    # Store last N TTCs values
     last_update: float
     speed: float = 0.0
     ttc: float = float('inf')  # Time to collision in seconds
@@ -52,24 +52,37 @@ class VehicleTracker:
         
     def calculate_vehicle_metrics(self, vehicle: TrackedVehicle, fps: float) -> Tuple[float, float]:
         """Calculate speed and time to collision for a vehicle."""
-        if len(vehicle.width_history) < METRIC_FRAME_GAP:
+        if len(vehicle.width_history) < (METRIC_HISTORY_GAP + 2):
             return 0.0, float('inf')
 
         # Calculate relative width change
         current_width, current_frame = vehicle.width_history[-1]
-        prev_width, prev_frame = vehicle.width_history[-METRIC_FRAME_GAP]
+        prev_width, prev_frame = vehicle.width_history[-(METRIC_HISTORY_GAP + 2)]
+        width_change = (current_width - prev_width) / prev_width
         width_relative_change = (current_width / prev_width)
         delta_time = (current_frame - prev_frame) / fps
 
         # Calculate speed based on width change
-        speed = width_relative_change * 100  # Convert to percentage
+        speed = width_change * 100  # Convert to percentage
 
         # Calculate time to collision (TTC)
         if width_relative_change > 1:
-            ttc = delta_time / (width_relative_change - 1)
+            momentary_ttc = (delta_time / (width_relative_change - 1))
         else:
-            ttc = float('inf')
-        return speed, ttc
+            momentary_ttc = float('inf')
+        return speed, momentary_ttc
+
+    # def calculate_ttc(self, vehicle: TrackedVehicle) -> float:
+    #     """Calculate the time to collision for a vehicle."""
+    #     if len(vehicle.momentary_ttc_history) < (METRIC_HISTORY_GAP + 2):
+    #         return float('inf')
+
+    #     current_ttc, current_frame = vehicle.momentary_ttc_history[-1]
+    #     prev_ttc, prev_frame = vehicle.momentary_ttc_history[-(METRIC_HISTORY_GAP + 2)]
+    #     momentary_ttc_derivative = (current_ttc - prev_ttc) / (current_frame - prev_frame)
+    #     variable_C = momentary_ttc_derivative + 1
+    #     ttc = current_ttc * (1 - np.sqrt(1 + 2 * variable_C)) / variable_C
+    #     return ttc
 
     def update(self, detections: List[DetectionProtocol], frame_shape: np.ndarray, frame_number: int, fps: float) -> List[TrackedVehicle]:
         """Update tracked vehicles with new detections.
@@ -95,9 +108,10 @@ class VehicleTracker:
                 continue
 
             # Calculate metrics
-            speed, ttc = self.calculate_vehicle_metrics(vehicle, fps)
+            speed, momentary_ttc = self.calculate_vehicle_metrics(vehicle, fps)
             vehicle.speed = speed
-            vehicle.ttc = ttc
+            # vehicle.momentary_ttc_history.append((momentary_ttc, current_frame))
+            vehicle.ttc = momentary_ttc
 
         # Match new detections to existing tracks
         for detection in detections:
@@ -127,6 +141,8 @@ class VehicleTracker:
                 # Keep history at fixed size
                 if len(best_match.width_history) > self.max_history:
                     best_match.width_history.popleft()
+                if len(best_match.momentary_ttc_history) > self.max_history:
+                    best_match.momentary_ttc_history.popleft()
 
                 # Check for warning condition
                 if best_match.speed > SPEED_THRESHOLD and best_match.ttc < TTC_THRESHOLD:
@@ -148,6 +164,7 @@ class VehicleTracker:
                     bbox=bbox,
                     confidence=detection.confidence,
                     width_history=deque([(width, current_frame)], maxlen=self.max_history),
+                    momentary_ttc_history=deque([(float('inf'), current_frame)], maxlen=self.max_history),
                     last_update=current_frame
                 )
                 self.tracked_vehicles[self.next_id] = new_vehicle
