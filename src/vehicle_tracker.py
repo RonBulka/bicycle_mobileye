@@ -10,7 +10,9 @@ from constansts import  CONFIDENCE_THRESHOLD, \
                         TTC_THRESHOLD, \
                         IOU_THRESHOLD, \
                         WARNING_STICKY_TIME_FRAME, \
-                        METRIC_HISTORY_GAP
+                        METRIC_HISTORY_GAP, \
+                        ROI_MIN, \
+                        ROI_MAX
 
 class DetectionProtocol(Protocol):
     """Protocol defining the required attributes for detection objects.
@@ -42,6 +44,7 @@ class TrackedVehicle:
     ttc: float = float('inf')  # Time to collision in seconds
     warning: bool = False
     count_warning: int = 0
+    ignore_warning: bool = False  # For ignoring side-entering vehicles
 
 class VehicleTracker:
     def __init__(self, max_history: int = MAX_HISTORY):
@@ -117,7 +120,11 @@ class VehicleTracker:
         for detection in detections:
             if detection.confidence < CONFIDENCE_THRESHOLD:
                 continue
-
+            
+            # ROI‐based ignore flag (Region-of-Interest (ROI) filter)
+            cx_norm = (detection.xmin + detection.xmax) / 2
+            ignore_for_warning = (cx_norm < ROI_MIN) or (cx_norm > ROI_MAX)
+            
             bbox = frame_norm(frame_shape, (detection.xmin, detection.ymin, detection.xmax, detection.ymax))
             width = bbox[2] - bbox[0]
 
@@ -137,6 +144,7 @@ class VehicleTracker:
                 best_match.confidence = detection.confidence
                 best_match.width_history.append((width, current_frame))
                 best_match.last_update = current_frame
+                best_match.ignore_warning |= ignore_for_warning
 
                 # Keep history at fixed size
                 if len(best_match.width_history) > self.max_history:
@@ -144,19 +152,22 @@ class VehicleTracker:
                 if len(best_match.momentary_ttc_history) > self.max_history:
                     best_match.momentary_ttc_history.popleft()
 
-                # Check for warning condition
-                if best_match.speed > SPEED_THRESHOLD and best_match.ttc < TTC_THRESHOLD:
-                    if not best_match.warning:
-                        best_match.warning = True
-                        best_match.count_warning = current_frame
-                    else: # Reset warning counter
-                        best_match.count_warning = current_frame
+                # Warnings if this track is not flagged ignore_warning
+                if (not best_match.ignore_warning):
+                    
+                    # Check for warning condition
+                    if best_match.speed > SPEED_THRESHOLD and best_match.ttc < TTC_THRESHOLD:
+                        if not best_match.warning:
+                            best_match.warning = True
+                            best_match.count_warning = current_frame
+                        else: # Reset warning counter
+                            best_match.count_warning = current_frame
 
-                # Check for sticky warning
-                if best_match.warning:
-                    if current_frame - best_match.count_warning > WARNING_STICKY_TIME_FRAME:
-                        best_match.warning = False
-                        best_match.count_warning = 0
+                    # Check for sticky warning
+                    if best_match.warning:
+                        if current_frame - best_match.count_warning > WARNING_STICKY_TIME_FRAME:
+                            best_match.warning = False
+                            best_match.count_warning = 0
 
             else:  # Create new track
                 new_vehicle = TrackedVehicle(
@@ -165,7 +176,8 @@ class VehicleTracker:
                     confidence=detection.confidence,
                     width_history=deque([(width, current_frame)], maxlen=self.max_history),
                     momentary_ttc_history=deque([(float('inf'), current_frame)], maxlen=self.max_history),
-                    last_update=current_frame
+                    last_update=current_frame,
+                    ignore_warning=ignore_for_warning
                 )
                 self.tracked_vehicles[self.next_id] = new_vehicle
                 self.next_id += 1

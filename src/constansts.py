@@ -7,6 +7,8 @@ TTC_THRESHOLD = 2.0             # Time to collision threshold to determine if a 
 IOU_THRESHOLD = 0.3             # Threshold to determine if a detection is a match
 WARNING_STICKY_TIME_FRAME = 10  # Number of frames to show a warning
 METRIC_HISTORY_GAP = 2          # Number of frames to skip for metrics
+ROI_MIN = 0.1
+ROI_MAX = 0.9
 
 # Camera dimensions
 CAMERA_PREVIEW_DIM = (640, 640)
