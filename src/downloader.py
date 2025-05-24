@@ -120,11 +120,17 @@ def parse_args():
         default=VAL_SAMPLES,
         help=f"Number of validation samples to export (default: {VAL_SAMPLES})"
     )
+    parser.add_argument(
+        "--export_dir", "-ed",
+        type=str,
+        default="dataset",
+        help="Directory to export the dataset (default: [cwd]/dataset)"
+    )
     return parser.parse_args()
 
 if __name__ == '__main__':
     args = parse_args()
-    export_dir = os.path.join(os.getcwd(), "dataset")
+    export_dir = os.path.join(os.getcwd(), args.export_dir)
     if not args.export_labels:
         export_only_images(export_dir, args.label_type, args.classes, args.train_samples, args.val_samples)
     elif args.export_labels:

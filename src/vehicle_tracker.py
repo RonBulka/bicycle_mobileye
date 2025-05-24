@@ -12,7 +12,11 @@ from constansts import  CONFIDENCE_THRESHOLD, \
                         WARNING_STICKY_TIME_FRAME, \
                         METRIC_HISTORY_GAP, \
                         ROI_MIN, \
-                        ROI_MAX
+                        ROI_MAX, \
+                        KALMAN_STATE_TRANSITION_MATRIX, \
+                        KALMAN_MEASUREMENT_MATRIX, \
+                        KALMAN_PROCESS_NOISE_COV, \
+                        KALMAN_MEASUREMENT_NOISE_COV
 
 class DetectionProtocol(Protocol):
     """Protocol defining the required attributes for detection objects.
@@ -32,19 +36,99 @@ class DetectionProtocol(Protocol):
     confidence: float
     label: int
 
+def get_adaptive_noise(change_ratio):
+    """Get adaptive noise based on change ratio."""
+    if change_ratio < 0.05:  # Small change
+        return 0.1  # Trust small changes
+    elif change_ratio > 0.20:  # Large change
+        return 2.0  # Be very skeptical of large changes
+    else:  # Medium change
+        # Linear interpolation between small and large noise
+        return 0.1 + (change_ratio - 0.05) * (2.0 - 0.1) / (0.20 - 0.05)
+
 @dataclass
 class TrackedVehicle:
     id: int
-    bbox: Tuple[int, int, int, int]  # xmin, ymin, xmax, ymax
+    bbox: Tuple[int, int, int, int]     # xmin, ymin, xmax, ymax
     confidence: float
-    width_history: deque  # Store last N frame widths
-    momentary_ttc_history: deque    # Store last N TTCs values
+    width_history: deque                # Store last N frame widths
+    momentary_ttc_history: deque        # Store last N TTCs values
     last_update: float
     speed: float = 0.0
-    ttc: float = float('inf')  # Time to collision in seconds
+    ttc: float = float('inf')           # Time to collision in seconds
     warning: bool = False
     count_warning: int = 0
-    ignore_warning: bool = False  # For ignoring side-entering vehicles
+    ignore_warning: bool = False        # For ignoring side-entering vehicles
+    kalman: cv2.KalmanFilter = None     # Kalman filter for tracking
+
+    def __post_init__(self):
+        # Initialize Kalman filter
+        self.kalman = cv2.KalmanFilter(8, 4)  # 8 state variables, 4 measurements
+
+        # State transition matrix (A)
+        self.kalman.transitionMatrix    = KALMAN_STATE_TRANSITION_MATRIX
+
+        # Measurement matrix (H)
+        self.kalman.measurementMatrix   = KALMAN_MEASUREMENT_MATRIX
+
+        # Process noise covariance (Q)
+        self.kalman.processNoiseCov     = KALMAN_PROCESS_NOISE_COV
+
+        # Measurement noise covariance (R)
+        self.kalman.measurementNoiseCov = KALMAN_MEASUREMENT_NOISE_COV
+
+        # Initialize state
+        x, y, w, h = self._bbox_to_state(self.bbox)
+        self.kalman.statePre    = np.array([[x], [y], [w], [h], [0], [0], [0], [0]], np.float32)
+        self.kalman.statePost   = np.array([[x], [y], [w], [h], [0], [0], [0], [0]], np.float32)
+
+    def _bbox_to_state(self, bbox: Tuple[int, int, int, int]) -> Tuple[float, float, float, float]:
+        """Convert bounding box to state representation (center x, y, width, height)."""
+        x = (bbox[0] + bbox[2]) / 2
+        y = (bbox[1] + bbox[3]) / 2
+        w = bbox[2] - bbox[0]
+        h = bbox[3] - bbox[1]
+        return x, y, w, h
+
+    def _state_to_bbox(self, state: np.ndarray) -> Tuple[int, int, int, int]:
+        """Convert state representation to bounding box."""
+        x, y, w, h = state[:4].flatten()
+        return (
+            int(x - (w / 2)),
+            int(y - (h / 2)),
+            int(x + (w / 2)),
+            int(y + (h / 2))
+        )
+
+    def predict(self) -> Tuple[int, int, int, int]:
+        """Predict next state using Kalman filter."""
+        prediction = self.kalman.predict()
+        return self._state_to_bbox(prediction)
+
+    def update(self, bbox: Tuple[int, int, int, int]):
+        """Update Kalman filter with new measurement using adaptive noise."""
+        x, y, w, h = self._bbox_to_state(bbox)
+        measurement = np.array([[x], [y], [w], [h]], np.float32)
+
+        # # Get current state estimate
+        # current_state = self.kalman.statePost
+
+        # # Calculate relative changes
+        # current_width = current_state[2, 0]
+        # new_width = measurement[2, 0]
+        # width_change_ratio = abs(new_width - current_width) / current_width
+
+        # current_x = current_state[0, 0]
+        # new_x = measurement[0, 0]
+        # x_change_ratio = abs(new_x - current_x) / current_x if current_x != 0 else 0
+
+        # # Update measurement noise matrix with adaptive noise for both width and x
+        # self.kalman.measurementNoiseCov[0, 0] = get_adaptive_noise(x_change_ratio)
+        # self.kalman.measurementNoiseCov[2, 2] = get_adaptive_noise(width_change_ratio)
+
+        # Update Kalman filter
+        self.kalman.correct(measurement)
+        self.bbox = self._state_to_bbox(self.kalman.statePost)
 
 class VehicleTracker:
     def __init__(self, max_history: int = MAX_HISTORY):
@@ -103,6 +187,11 @@ class VehicleTracker:
         current_frame = frame_number
         self.frame_count += 1
 
+        # Predict next state for all existing tracks
+        for vehicle in self.tracked_vehicles.values():
+            predicted_bbox = vehicle.predict()
+            vehicle.bbox = predicted_bbox
+
         # Update existing tracks
         for vehicle_id, vehicle in list(self.tracked_vehicles.items()):
             # Remove old tracks
@@ -113,15 +202,14 @@ class VehicleTracker:
             # Calculate metrics
             speed, momentary_ttc = self.calculate_vehicle_metrics(vehicle, fps)
             vehicle.speed = speed
-            # vehicle.momentary_ttc_history.append((momentary_ttc, current_frame))
             vehicle.ttc = momentary_ttc
 
         # Match new detections to existing tracks
         for detection in detections:
             if detection.confidence < CONFIDENCE_THRESHOLD:
                 continue
-            
-            # ROI‐based ignore flag (Region-of-Interest (ROI) filter)
+
+            # ROI‐based ignore flag
             cx_norm = (detection.xmin + detection.xmax) / 2
             ignore_for_warning = (cx_norm < ROI_MIN) or (cx_norm > ROI_MAX)
             
@@ -140,7 +228,8 @@ class VehicleTracker:
                     best_match = vehicle
 
             if best_match and best_iou > IOU_THRESHOLD:  # Update existing track
-                best_match.bbox = bbox
+                best_match.update(bbox)  # Update Kalman filter
+                width = best_match.bbox[2] - best_match.bbox[0]
                 best_match.confidence = detection.confidence
                 best_match.width_history.append((width, current_frame))
                 best_match.last_update = current_frame
@@ -154,7 +243,6 @@ class VehicleTracker:
 
                 # Warnings if this track is not flagged ignore_warning
                 if (not best_match.ignore_warning):
-                    
                     # Check for warning condition
                     if best_match.speed > SPEED_THRESHOLD and best_match.ttc < TTC_THRESHOLD:
                         if not best_match.warning:
