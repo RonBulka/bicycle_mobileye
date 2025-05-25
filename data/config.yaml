@@ -1,4 +1,4 @@
-path: ./data # dataset root dir
+path: /home/user_106/bicycle_mobileye/data # dataset root dir
 train: images/train # train images (relative to 'path')
 val: images/val # val images (relative to 'path')
 
