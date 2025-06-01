@@ -86,7 +86,7 @@ def main(args):
         fps = 15  # Assuming 15 FPS for the OAK-D camera
         frame_width, frame_height = CAMERA_PREVIEW_DIM
 
-        fourcc = cv2.VideoWriter_fourcc(*'MP4V')
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         out = cv2.VideoWriter(OUTPUT_VIDEO, fourcc, fps, (frame_width, frame_height))
 
         start_time = time.time()
@@ -105,7 +105,7 @@ def main(args):
                     frame = inVideo.getCvFrame()
 
                     # Update vehicle tracking
-                    tracked_vehicles = vehicle_tracker.update(detections, frame.shape[:2])
+                    tracked_vehicles = vehicle_tracker.update(detections, frame, frame_count, fps)
 
                     # Annotate the frame with tracked vehicles
                     annotated_frame = annotate_frame(frame, tracked_vehicles, fps)
