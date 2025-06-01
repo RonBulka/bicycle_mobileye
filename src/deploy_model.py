@@ -5,7 +5,7 @@ import cv2
 import depthai as dai
 import time
 import argparse
-import msvcrt
+import signal
 from vehicle_tracker import VehicleTracker, annotate_frame
 from constansts import CAMERA_PREVIEW_DIM
 
@@ -125,10 +125,12 @@ def main(args):
                         if cv2.waitKey(1) & 0xFF == ord('q'):
                             break
                     else:
-                        if msvcrt.kbhit():
-                            if msvcrt.getch() == b'q':
-                                break
+                        # In production mode, just continue processing
+                        # User can stop with Ctrl+C
+                        pass
 
+        except KeyboardInterrupt:
+            print("\nStopping video capture...")
         finally:
             # Release resources
             out.release()
