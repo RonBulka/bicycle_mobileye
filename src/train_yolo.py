@@ -2,7 +2,12 @@
 import torch
 import argparse
 from ultralytics import YOLO
-from constansts import EPOCHS, BATCH_SIZE, IMAGE_SIZE, CONFIG, MODEL, OUTPUT_DIR
+from constants import EPOCHS, \
+                      BATCH_SIZE, \
+                      IMAGE_SIZE, \
+                      CONFIG, \
+                      MODEL, \
+                      OUTPUT_DIR
 
 # add args to the script
 def parse_args():

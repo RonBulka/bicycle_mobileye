@@ -5,7 +5,7 @@ import cv2
 import torch
 from ultralytics import YOLO
 from vehicle_tracker import VehicleTracker, annotate_frame
-from constansts import CONFIDENCE_THRESHOLD
+from constants import CONFIDENCE_THRESHOLD
 import time
 
 def parse_args():

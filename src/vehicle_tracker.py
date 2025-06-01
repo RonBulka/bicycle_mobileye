@@ -3,7 +3,7 @@ from typing import Tuple, List, Dict, Protocol
 from collections import deque
 import numpy as np
 import cv2
-from constansts import  CONFIDENCE_THRESHOLD, \
+from constants import   CONFIDENCE_THRESHOLD, \
                         MAX_HISTORY, \
                         REMOVE_TIME_FRAME, \
                         SPEED_THRESHOLD, \

@@ -5,9 +5,8 @@ import cv2
 import depthai as dai
 import time
 import argparse
-import signal
 from vehicle_tracker import VehicleTracker, annotate_frame
-from constansts import CAMERA_PREVIEW_DIM
+from constants import CAMERA_PREVIEW_DIM
 
 # Current working directory
 cwd = os.getcwd()
