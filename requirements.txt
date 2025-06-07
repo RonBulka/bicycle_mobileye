@@ -10,3 +10,4 @@ openvino==2024.6.0
 openvino-dev==2024.6.0
 blobconverter==1.4.3
 depthai==2.29.0.0
+pygame==2.5.2
