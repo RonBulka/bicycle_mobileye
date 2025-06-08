@@ -1,33 +1,8 @@
 #!/usr/bin/env python
 import pygame
 import time
-import subprocess
 import os
-import platform
-import sys
 import numpy as np
-
-def check_bluetooth_connection():
-    """Check if a Bluetooth device is connected"""
-    system = platform.system()
-    
-    try:
-        if system == "Linux":  # Raspberry Pi or other Linux systems
-            result = subprocess.run(['bluetoothctl', 'devices', 'Connected'], 
-                                  capture_output=True, text=True)
-            return len(result.stdout.strip()) > 0
-        elif system == "Windows":
-            # On Windows, we'll use a simpler approach - just check if pygame can initialize
-            # This is because Windows handles audio routing automatically
-            pygame.mixer.init()
-            pygame.mixer.quit()
-            return True
-        else:
-            print(f"Unsupported operating system: {system}")
-            return False
-    except Exception as e:
-        print(f"Error checking Bluetooth connection: {e}")
-        return False
 
 def generate_tone(frequency, duration, volume=0.5):
     """Generate a sine wave tone at the specified frequency"""
@@ -70,7 +45,7 @@ def play_melody(volume=0.5):
 
 def play_audio():
     """Play audio through the default audio device"""
-    file_path = "audio\Rick-Roll-Sound-Effect.mp3"
+    file_path = "audio/Rick-Roll-Sound-Effect.mp3"
     if not os.path.exists(file_path):
         print(f"Audio file {file_path} not found.")
         return
@@ -92,15 +67,10 @@ def play_audio():
         pygame.mixer.quit()
 
 def main():
-    # Check if we can play audio
-    if not check_bluetooth_connection():
-        print("No audio device available. Please connect a device first.")
-        return
-
     # Play the melody at different volumes
-    play_melody(volume=0.10)
+    # play_melody(volume=0.10)
 
-    #play_audio()
+    play_audio()
 
 if __name__ == "__main__":
     main() 
