@@ -45,7 +45,7 @@ def play_melody(volume=0.5):
 
 def play_audio():
     """Play audio through the default audio device"""
-    file_path = "audio/Rick-Roll-Sound-Effect.mp3"
+    file_path = "audio/clock-alarm-8762.mp3"
     if not os.path.exists(file_path):
         print(f"Audio file {file_path} not found.")
         return
@@ -53,13 +53,15 @@ def play_audio():
         # Initialize pygame mixer
         pygame.mixer.init()
 
-        # Load and play the audio file
+        # Load and play the audio file repeatly
         pygame.mixer.music.load(file_path)
-        pygame.mixer.music.play()
+        while True:
+            pygame.mixer.music.play()
+            time.sleep(0.8)
 
-        # Wait for the audio to finish playing
-        while pygame.mixer.music.get_busy():
-            time.sleep(1)
+            # Wait for the audio to finish playing
+            # while pygame.mixer.music.get_busy():
+            #     time.sleep(0.44)
 
     except Exception as e:
         print(f"Error playing audio: {e}")

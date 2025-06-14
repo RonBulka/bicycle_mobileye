@@ -7,6 +7,11 @@ from ultralytics import YOLO
 from vehicle_tracker import VehicleTracker, annotate_frame
 from constants import CONFIDENCE_THRESHOLD
 import time
+import numpy as np
+from pydub import AudioSegment
+import tempfile
+import subprocess
+import shutil
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Run YOLO object detection on video')
@@ -126,6 +131,48 @@ def play_video(video_path: str):
     cap.release()
     cv2.destroyAllWindows()
 
+def get_video_audio(input_video_path: str) -> AudioSegment:
+    """Return empty audio segment."""
+    # try:
+    #     return AudioSegment.from_file(input_video_path)
+    # except:
+    #     # Return empty audio segment if no audio track exists
+    return AudioSegment.silent(duration=0)
+
+def create_warning_audio(warning_manager, duration_ms: int) -> AudioSegment:
+    """Create audio segment from warning sound."""
+    warning_sound_path = "audio/clock-alarm-8762.mp3"
+    if not os.path.exists(warning_sound_path):
+        return AudioSegment.silent(duration=duration_ms)
+    
+    warning_sound = AudioSegment.from_file(warning_sound_path)
+    # Repeat the warning sound to match video duration
+    repeats = int(np.ceil(duration_ms / len(warning_sound)))
+    return warning_sound * repeats
+
+def combine_audio_video(video_path: str, audio_path: str, output_path: str):
+    """Combine video and audio using ffmpeg."""
+    temp_output = tempfile.NamedTemporaryFile(suffix='.mp4', delete=False).name
+    try:
+        # Use ffmpeg to combine video and audio
+        cmd = [
+            'ffmpeg', '-y',
+            '-i', video_path,
+            '-i', audio_path,
+            '-c:v', 'copy',
+            '-c:a', 'aac',
+            '-map', '0:v:0',
+            '-map', '1:a:0',
+            temp_output
+        ]
+        subprocess.run(cmd, check=True, capture_output=True)
+        
+        # Copy the file instead of moving it
+        shutil.copy2(temp_output, output_path)
+    finally:
+        if os.path.exists(temp_output):
+            os.unlink(temp_output)
+
 def main(args):
     # Load the YOLOv8 model using command line argument
     model = YOLO(args.model)
@@ -134,6 +181,7 @@ def main(args):
     cwd = os.getcwd()
     input_video_path = os.path.join(cwd, args.input_dir, args.input_name)
     output_video_path = os.path.join(cwd, args.output_dir, args.output_name)
+    temp_video_path = os.path.join(cwd, args.output_dir, 'temp_' + args.output_name)
 
     # Open the video using OpenCV
     video_capture = cv2.VideoCapture(input_video_path)
@@ -143,25 +191,29 @@ def main(args):
     frame_height = int(video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps = int(video_capture.get(cv2.CAP_PROP_FPS))
     total_frames = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
+    video_duration_ms = int((total_frames / fps) * 1000)
 
     # Define the codec and create VideoWriter object to save output video
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # H.264 codec for better compatibility
-    out_video = cv2.VideoWriter(output_video_path, fourcc, fps, (frame_width, frame_height))
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    out_video = cv2.VideoWriter(temp_video_path, fourcc, fps, (frame_width, frame_height))
     
     # Check if VideoWriter was initialized successfully
     if not out_video.isOpened():
-        print(f"Error: Could not create output video file at {output_video_path}")
+        print(f"Error: Could not create output video file at {temp_video_path}")
         print("Please check if the output directory exists and you have write permissions")
         return
 
     # Initialize vehicle tracker
     vehicle_tracker = VehicleTracker()
 
+    # Track warning states for audio generation
+    warning_states = []
+
     # Iterate over each frame
     frame_count = 0
     start_time = time.time()
     while video_capture.isOpened():
-        ret, frame = video_capture.read()  # Read a frame
+        ret, frame = video_capture.read()
         if not ret:
             break
 
@@ -173,13 +225,15 @@ def main(args):
         for result in results.boxes.data.tolist():
             x1, y1, x2, y2, conf, cls = result[:6]
             if conf > args.confidence:
-                # Normalize coordinates to [0,1] range
                 x1, x2 = x1 / frame_width, x2 / frame_width
                 y1, y2 = y1 / frame_height, y2 / frame_height
                 detections.append(YOLODetection(x1, y1, x2, y2, conf, int(cls)))
 
         # Update vehicle tracking
         tracked_vehicles = vehicle_tracker.update(detections, frame, frame_count, fps)
+        
+        # Record warning state for this frame
+        warning_states.append(any(vehicle.warning for vehicle in tracked_vehicles))
 
         # Annotate the frame with tracked vehicles
         annotated_frame = annotate_frame(frame, tracked_vehicles, fps)
@@ -203,8 +257,46 @@ def main(args):
     # Release resources
     video_capture.release()
     out_video.release()
+    vehicle_tracker.warning_manager.stop_audio_thread()
     if args.test:
         cv2.destroyAllWindows()
+
+    # Create audio tracks
+    print("Creating audio tracks...")
+    input_audio = get_video_audio(input_video_path)
+    warning_audio = create_warning_audio(vehicle_tracker.warning_manager, video_duration_ms)
+    
+    # Create warning audio track based on recorded states
+    warning_track = AudioSegment.silent(duration=video_duration_ms)
+    frame_duration_ms = int(1000 / 30)
+    
+    for i, has_warning in enumerate(warning_states):
+        if has_warning:
+            start_ms = i * frame_duration_ms
+            end_ms = start_ms + frame_duration_ms
+            warning_track = warning_track.overlay(
+                warning_audio[start_ms:end_ms],
+                position=start_ms
+            )
+
+    # Mix input audio with warning audio
+    if len(input_audio) > 0:
+        final_audio = input_audio.overlay(warning_track)
+    else:
+        final_audio = warning_track
+
+    # Save audio to temporary file
+    temp_audio_path = tempfile.NamedTemporaryFile(suffix='.wav', delete=False).name
+    final_audio.export(temp_audio_path, format='wav')
+
+    # Combine video and audio
+    print("Combining video and audio...")
+    combine_audio_video(temp_video_path, temp_audio_path, output_video_path)
+
+    # Clean up temporary files
+    os.unlink(temp_video_path)
+    os.unlink(temp_audio_path)
+
 
     # Verify the output file exists and has content
     if os.path.exists(output_video_path):

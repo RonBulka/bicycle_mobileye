@@ -3,6 +3,10 @@ from typing import Tuple, List, Dict, Protocol
 from collections import deque
 import numpy as np
 import cv2
+import pygame
+import time
+import os
+import threading
 from constants import   CONFIDENCE_THRESHOLD, \
                         MAX_HISTORY, \
                         REMOVE_TIME_FRAME, \
@@ -130,13 +134,84 @@ class TrackedVehicle:
         self.kalman.correct(measurement)
         self.bbox = self._state_to_bbox(self.kalman.statePost)
 
+class WarningStateManager:
+    def __init__(self):
+        self._lock = threading.Lock()
+        self._has_warning = False
+        self._stop_event = threading.Event()
+        self._audio_thread = None
+
+    def update_warning_state(self, tracked_vehicles: List[TrackedVehicle]):
+        with self._lock:
+            self._has_warning = any(vehicle.warning for vehicle in tracked_vehicles)
+
+    def has_warning(self) -> bool:
+        with self._lock:
+            return self._has_warning
+
+    def start_audio_thread(self):
+        if self._audio_thread is None or not self._audio_thread.is_alive():
+            self._stop_event.clear()
+            self._audio_thread = threading.Thread(target=self._audio_loop, daemon=True)
+            self._audio_thread.start()
+
+    def stop_audio_thread(self):
+        self._stop_event.set()
+        if self._audio_thread and self._audio_thread.is_alive():
+            self._audio_thread.join()
+
+    def _audio_loop(self):
+        """Audio loop that runs in a separate thread."""
+        file_path = "audio/clock-alarm-8762.mp3"
+        if not os.path.exists(file_path):
+            print(f"Audio file {file_path} not found.")
+            return
+
+        try:
+            pygame.mixer.init()
+            pygame.mixer.music.load(file_path)
+            
+            while not self._stop_event.is_set():
+                if self.has_warning():
+                    pygame.mixer.music.play()
+                    # Wait for the audio to finish or until warning state changes
+                    while pygame.mixer.music.get_busy() and self.has_warning() and not self._stop_event.is_set():
+                        time.sleep(0.1)
+                else:
+                    time.sleep(0.1)  # Small sleep to prevent busy waiting
+
+        except Exception as e:
+            print(f"Error in audio thread: {e}")
+        finally:
+            pygame.mixer.quit()
+
 class VehicleTracker:
     def __init__(self, max_history: int = MAX_HISTORY):
         self.tracked_vehicles: Dict[int, TrackedVehicle] = {}
         self.next_id = 0
         self.max_history = max_history
         self.frame_count = 0
-        
+        self.warning_manager = WarningStateManager()
+        self.warning_manager.start_audio_thread()
+
+    def _update_warning_state(self, vehicle: TrackedVehicle, current_frame: int):
+        """Update warning state for a vehicle."""
+        # Warnings if this track is not flagged ignore_warning
+        if (not vehicle.ignore_warning):
+            # Check for warning condition
+            if vehicle.speed > SPEED_THRESHOLD and vehicle.ttc < TTC_THRESHOLD:
+                if not vehicle.warning:
+                    vehicle.warning = True
+                    vehicle.count_warning = current_frame
+                else: # Reset warning counter
+                    vehicle.count_warning = current_frame
+
+            # Check for sticky warning
+            if vehicle.warning:
+                if current_frame - vehicle.count_warning > WARNING_STICKY_TIME_FRAME:
+                    vehicle.warning = False
+                    vehicle.count_warning = 0
+
     def calculate_vehicle_metrics(self, vehicle: TrackedVehicle, fps: float) -> Tuple[float, float]:
         """Calculate speed and time to collision for a vehicle."""
         if len(vehicle.width_history) < (METRIC_HISTORY_GAP + 2):
@@ -180,7 +255,8 @@ class VehicleTracker:
                 - confidence: detection confidence score (0-1)
                 - label: class label
             frame_shape: Tuple of (height, width) of the frame
-            
+            frame_number: Current frame number
+            fps: Frames per second
         Returns:
             List of currently tracked vehicles
         """
@@ -212,52 +288,48 @@ class VehicleTracker:
             # ROI‐based ignore flag
             cx_norm = (detection.xmin + detection.xmax) / 2
             ignore_for_warning = (cx_norm < ROI_MIN) or (cx_norm > ROI_MAX)
-            
-            bbox = frame_norm(frame_shape, (detection.xmin, detection.ymin, detection.xmax, detection.ymax))
-            width = bbox[2] - bbox[0]
 
-            # Find best matching existing track
+            # Convert normalized coordinates to pixel coordinates
+            bbox = frame_norm(frame_shape, (detection.xmin, detection.ymin, detection.xmax, detection.ymax))
+
+            # Try to match with existing tracks
+            best_iou = 0
             best_match = None
-            best_iou = 0.0
 
             for vehicle in self.tracked_vehicles.values():
-                prev_bbox = vehicle.bbox
-                iou = self.calculate_iou(bbox, prev_bbox)
-                if iou > best_iou:
+                iou = self.calculate_iou(vehicle.bbox, bbox)
+                if iou > best_iou and iou > IOU_THRESHOLD:
                     best_iou = iou
                     best_match = vehicle
 
-            if best_match and best_iou > IOU_THRESHOLD:  # Update existing track
+            if best_match:               # Update existing track
                 best_match.update(bbox)  # Update Kalman filter
                 width = best_match.bbox[2] - best_match.bbox[0]
                 best_match.confidence = detection.confidence
                 best_match.width_history.append((width, current_frame))
                 best_match.last_update = current_frame
                 best_match.ignore_warning |= ignore_for_warning
+                best_match.warning = best_match.warning and not best_match.ignore_warning
 
-                # Keep history at fixed size
+                # Update width history
+                width = bbox[2] - bbox[0]
+                best_match.width_history.append((width, current_frame))
                 if len(best_match.width_history) > self.max_history:
                     best_match.width_history.popleft()
+
+                # Calculate metrics
+                speed, momentary_ttc = self.calculate_vehicle_metrics(best_match, fps)
+                best_match.speed = speed
+                best_match.momentary_ttc_history.append((momentary_ttc, current_frame))
                 if len(best_match.momentary_ttc_history) > self.max_history:
                     best_match.momentary_ttc_history.popleft()
 
-                # Warnings if this track is not flagged ignore_warning
-                if (not best_match.ignore_warning):
-                    # Check for warning condition
-                    if best_match.speed > SPEED_THRESHOLD and best_match.ttc < TTC_THRESHOLD:
-                        if not best_match.warning:
-                            best_match.warning = True
-                            best_match.count_warning = current_frame
-                        else: # Reset warning counter
-                            best_match.count_warning = current_frame
+                # Update warning state
+                self._update_warning_state(best_match, current_frame)
 
-                    # Check for sticky warning
-                    if best_match.warning:
-                        if current_frame - best_match.count_warning > WARNING_STICKY_TIME_FRAME:
-                            best_match.warning = False
-                            best_match.count_warning = 0
-
-            else:  # Create new track
+            else:
+                width = bbox[2] - bbox[0]
+                # Create new track
                 new_vehicle = TrackedVehicle(
                     id=self.next_id,
                     bbox=bbox,
@@ -269,6 +341,9 @@ class VehicleTracker:
                 )
                 self.tracked_vehicles[self.next_id] = new_vehicle
                 self.next_id += 1
+
+        # Update warning manager
+        self.warning_manager.update_warning_state(list(self.tracked_vehicles.values()))
 
         return list(self.tracked_vehicles.values())
 

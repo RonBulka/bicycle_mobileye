@@ -214,6 +214,7 @@ def main(args):
     # Release resources
     video_capture.release()
     out_video.release()
+    vehicle_tracker.warning_manager.stop_audio_thread()
     if args.test:
         cv2.destroyAllWindows()
 

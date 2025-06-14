@@ -6,60 +6,53 @@ import depthai as dai
 import time
 import argparse
 from vehicle_tracker import VehicleTracker, annotate_frame
-from constants import CAMERA_PREVIEW_DIM
+from constants import CAMERA_PREVIEW_DIM, CONFIDENCE_THRESHOLD
 
 # Current working directory
 cwd = os.getcwd()
 
 # Define paths to the model, test data directory, and results
 YOLO_MODEL = os.path.join(cwd, "luxonis_output/last_openvino_2022.1_6shave.blob")
-YOLO_CONFIG = os.path.join(cwd, "luxonis_output/last.json")
 
 # Input and output video paths
 OUTPUT_VIDEO = "vid_result/test_video.mp4"
-def create_camera_pipeline(config_path, model_path):
-    """Creates a pipeline for the camera and YOLO detection."""
+
+def create_camera_pipeline(model_path):
+    """Creates a pipeline for the camera and YOLO detection using DepthAI v3 API."""
+    # Create pipeline
     pipeline = dai.Pipeline()
-    model_config = load_config(config_path)
-    nnConfig = model_config.get("nn_config", {})
-    metadata = nnConfig.get("NN_specific_metadata", {})
-    classes = metadata.get("classes", {})
-    coordinates = metadata.get("coordinates", {})
-    anchors = metadata.get("anchors", {})
-    anchorMasks = metadata.get("anchor_masks", {})
-    iouThreshold = metadata.get("iou_threshold", {})
-    confidenceThreshold = metadata.get("confidence_threshold", {})
 
-    # Create camera node
-    camRgb = pipeline.create(dai.node.ColorCamera)
-    camRgb.setPreviewSize(CAMERA_PREVIEW_DIM[0], CAMERA_PREVIEW_DIM[1])
-    camRgb.setVideoSize(CAMERA_PREVIEW_DIM[0], CAMERA_PREVIEW_DIM[1])
-    camRgb.setInterleaved(False)
-    camRgb.setBoardSocket(dai.CameraBoardSocket.CAM_A)  # Use CAM_A instead of RGB
-    camRgb.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
+    # Create nodes
+    cam = pipeline.create(dai.node.ColorCamera)
+    detection_nn = pipeline.create(dai.node.YoloDetectionNetwork)
+    xout_nn = pipeline.create(dai.node.XLinkOut)
+    xout_video = pipeline.create(dai.node.XLinkOut)
 
-    # Create detection network node
-    detectionNetwork = pipeline.create(dai.node.YoloDetectionNetwork)
-    nnOut = pipeline.create(dai.node.XLinkOut)
-    videoOut = pipeline.create(dai.node.XLinkOut)
+    # Set output streams
+    xout_nn.setStreamName("nn")
+    xout_video.setStreamName("video")
 
-    nnOut.setStreamName("nn")
-    videoOut.setStreamName("video")
+    # Configure camera
+    cam.setPreviewSize(CAMERA_PREVIEW_DIM[0], CAMERA_PREVIEW_DIM[1])  # Set preview to match model input
+    cam.setVideoSize(CAMERA_PREVIEW_DIM[0], CAMERA_PREVIEW_DIM[1])    # Set video output to match model input
+    cam.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
+    cam.setInterleaved(False)
+    cam.setBoardSocket(dai.CameraBoardSocket.CAM_A)
+    cam.setColorOrder(dai.ColorCameraProperties.ColorOrder.BGR)
 
-    detectionNetwork.setConfidenceThreshold(confidenceThreshold)
-    detectionNetwork.setNumClasses(classes)
-    detectionNetwork.setCoordinateSize(coordinates)
-    detectionNetwork.setAnchors(anchors)
-    detectionNetwork.setAnchorMasks(anchorMasks)
-    detectionNetwork.setIouThreshold(iouThreshold)
-    detectionNetwork.setBlobPath(model_path)
-    detectionNetwork.setNumInferenceThreads(2)
-    detectionNetwork.input.setBlocking(False)
+    # Configure detection network
+    detection_nn.setBlobPath(model_path)
+    detection_nn.setConfidenceThreshold(CONFIDENCE_THRESHOLD)
+    detection_nn.setNumClasses(1)  # For vehicle detection
+    detection_nn.setCoordinateSize(4)
+    detection_nn.setIouThreshold(0.5)
+    detection_nn.setNumInferenceThreads(2)
+    detection_nn.input.setBlocking(False)
 
     # Linking
-    camRgb.preview.link(detectionNetwork.input)
-    camRgb.video.link(videoOut.input)  # Link video output
-    detectionNetwork.out.link(nnOut.input)
+    cam.preview.link(detection_nn.input)
+    cam.video.link(xout_video.input)
+    detection_nn.out.link(xout_nn.input)
 
     return pipeline
 
@@ -70,21 +63,20 @@ def load_config(config_path):
 
 def main(args):
     # Create pipeline
-    pipeline = create_camera_pipeline(YOLO_CONFIG, YOLO_MODEL)
+    pipeline = create_camera_pipeline(YOLO_MODEL)
 
     # Initialize vehicle tracker
     vehicle_tracker = VehicleTracker()
 
     # Connect to device and start pipeline
     with dai.Device(pipeline) as device:
-        # Define the queues that will be used to receive the neural network output and video frames
-        detectionNN = device.getOutputQueue("nn", maxSize=4, blocking=False)
-        videoQueue = device.getOutputQueue("video", maxSize=4, blocking=False)
+        # Get output queues
+        q_nn = device.getOutputQueue(name="nn", maxSize=4, blocking=False)
+        q_video = device.getOutputQueue(name="video", maxSize=4, blocking=False)
 
-        # Video writer to save the output video
-        fps = 15  # Assuming 15 FPS for the OAK-D camera
+        # Video writer setup
+        fps = 15
         frame_width, frame_height = CAMERA_PREVIEW_DIM
-
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         out = cv2.VideoWriter(OUTPUT_VIDEO, fourcc, fps, (frame_width, frame_height))
 
@@ -93,18 +85,22 @@ def main(args):
 
         try:
             while True:
-                inDet = detectionNN.get()
-                detections = []
-                if inDet is not None:
-                    detections = inDet.detections
+                # Get detection results
+                in_nn = q_nn.get()
+                detections = in_nn.detections if in_nn is not None else []
 
-                # Retrieve the frame from the camera preview
-                inVideo = videoQueue.get()
-                if inVideo is not None:
-                    frame = inVideo.getCvFrame()
+                # Get video frame
+                in_video = q_video.get()
+                if in_video is not None:
+                    frame = in_video.getCvFrame()
 
-                    # Update vehicle tracking
-                    tracked_vehicles = vehicle_tracker.update(detections, frame, frame_count, fps)
+                    # Update vehicle tracking with detections
+                    tracked_vehicles = vehicle_tracker.update(
+                        detections=detections,
+                        frame_shape=frame,
+                        frame_number=frame_count,
+                        fps=fps
+                    )
 
                     # Annotate the frame with tracked vehicles
                     annotated_frame = annotate_frame(frame, tracked_vehicles, fps)
@@ -133,6 +129,7 @@ def main(args):
         finally:
             # Release resources
             out.release()
+            vehicle_tracker.warning_manager.stop_audio_thread()
             if args.test:
                 cv2.destroyAllWindows()
 
