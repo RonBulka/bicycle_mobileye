@@ -15,7 +15,7 @@ def is_vehicle(box):
         return False
 
 def annotate_images(images_dir, output_dir, model):
-    results = model(source=images_dir, conf=0.5)
+    results = model(source=images_dir, stream=True, conf=0.5)
 
     for result in results:
         img_path = result.path
@@ -44,10 +44,10 @@ def annotate_images(images_dir, output_dir, model):
 # Load the model
 model = YOLO("yolo11x.pt")
 images_train_dir = "dataset/images/train"
-output_train_dir = "dataset/labels/train_yolo"
+output_train_dir = "dataset/labels/train"
 os.makedirs(output_train_dir, exist_ok=True)
 images_val_dir = "dataset/images/val"
-output_val_dir = "dataset/labels/val_yolo"
+output_val_dir = "dataset/labels/val"
 os.makedirs(output_val_dir, exist_ok=True)
 
 annotate_images(images_train_dir, output_train_dir, model)
