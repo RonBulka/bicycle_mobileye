@@ -31,20 +31,36 @@ import pygame
 import time
 import os
 import threading
-from .constants import  CONFIDENCE_THRESHOLD, \
-                        MAX_HISTORY, \
-                        REMOVE_TIME_FRAME, \
-                        SPEED_THRESHOLD, \
-                        TTC_THRESHOLD, \
-                        IOU_THRESHOLD, \
-                        WARNING_STICKY_TIME_FRAME, \
-                        METRIC_HISTORY_GAP, \
-                        ROI_MIN, \
-                        ROI_MAX, \
-                        KALMAN_STATE_TRANSITION_MATRIX, \
-                        KALMAN_MEASUREMENT_MATRIX, \
-                        KALMAN_PROCESS_NOISE_COV, \
-                        KALMAN_MEASUREMENT_NOISE_COV
+try:
+    from .constants import  CONFIDENCE_THRESHOLD, \
+                            MAX_HISTORY, \
+                            REMOVE_TIME_FRAME, \
+                            SPEED_THRESHOLD, \
+                            TTC_THRESHOLD, \
+                            IOU_THRESHOLD, \
+                            WARNING_STICKY_TIME_FRAME, \
+                            METRIC_HISTORY_GAP, \
+                            ROI_MIN, \
+                            ROI_MAX, \
+                            KALMAN_STATE_TRANSITION_MATRIX, \
+                            KALMAN_MEASUREMENT_MATRIX, \
+                            KALMAN_PROCESS_NOISE_COV, \
+                            KALMAN_MEASUREMENT_NOISE_COV
+except ImportError:
+    from constants import  CONFIDENCE_THRESHOLD, \
+                            MAX_HISTORY, \
+                            REMOVE_TIME_FRAME, \
+                            SPEED_THRESHOLD, \
+                            TTC_THRESHOLD, \
+                            IOU_THRESHOLD, \
+                            WARNING_STICKY_TIME_FRAME, \
+                            METRIC_HISTORY_GAP, \
+                            ROI_MIN, \
+                            ROI_MAX, \
+                            KALMAN_STATE_TRANSITION_MATRIX, \
+                            KALMAN_MEASUREMENT_MATRIX, \
+                            KALMAN_PROCESS_NOISE_COV, \
+                            KALMAN_MEASUREMENT_NOISE_COV
 
 class DetectionProtocol(Protocol):
     """Protocol defining the required attributes for detection objects.

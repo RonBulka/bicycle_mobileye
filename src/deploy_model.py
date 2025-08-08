@@ -37,8 +37,11 @@ import cv2
 import depthai as dai
 import time
 import argparse
-from .vehicle_tracker import VehicleTracker, annotate_frame
-from .constants import CAMERA_PREVIEW_DIM, CONFIDENCE_THRESHOLD
+from vehicle_tracker import VehicleTracker, annotate_frame
+try:
+    from .constants import CAMERA_PREVIEW_DIM, CONFIDENCE_THRESHOLD
+except ImportError:
+    from constants import CAMERA_PREVIEW_DIM, CONFIDENCE_THRESHOLD
 
 # Current working directory
 cwd = os.getcwd()

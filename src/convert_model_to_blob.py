@@ -38,7 +38,10 @@ import os
 import blobconverter
 import json
 from ultralytics import YOLO
-from .constants import IMAGE_SIZE
+try:
+    from .constants import IMAGE_SIZE
+except ImportError:
+    from constants import IMAGE_SIZE
 import onnx
 
 # Image size

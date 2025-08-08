@@ -27,12 +27,10 @@ vehicles that pose collision risks to cyclists.
 import torch
 import argparse
 from ultralytics import YOLO
-from .constants import EPOCHS, \
-                       BATCH_SIZE, \
-                       IMAGE_SIZE, \
-                       CONFIG, \
-                       MODEL, \
-                       OUTPUT_DIR
+try:
+    from .constants import EPOCHS, BATCH_SIZE, IMAGE_SIZE, CONFIG, MODEL, OUTPUT_DIR
+except ImportError:
+    from constants import EPOCHS, BATCH_SIZE, IMAGE_SIZE, CONFIG, MODEL, OUTPUT_DIR
 
 # add args to the script
 def parse_args():
@@ -80,6 +78,8 @@ if __name__ == '__main__':
     print(f"Is CUDA available? {torch.cuda.is_available()}")
     if torch.cuda.is_available():
         print(f"Using device: {torch.cuda.get_device_name(0)}")
+        print(f"GPU Memory: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.1f} GB")
+        print(f"Available GPU Memory: {torch.cuda.memory_allocated(0) / 1024**3:.1f} GB allocated")
     else:
         print("No GPU detected. Training will run on the CPU.")
 
@@ -92,5 +92,16 @@ if __name__ == '__main__':
         epochs=args.epochs,
         batch=args.batch,
         imgsz=args.imgsz,
-        project=args.output
+        project=args.output,
+        # Memory optimization parameters
+        cache=True,  # Cache images in RAM for faster training
+        workers=4,   # Reduce number of workers to save memory
+        device=0 if torch.cuda.is_available() else 'cpu',  # Explicitly set device
+        # Stability parameters
+        patience=50,  # Early stopping patience
+        save_period=10,  # Save checkpoints every 10 epochs
+        lr0=0.01,  # Initial learning rate
+        lrf=0.01,  # Final learning rate factor
+        momentum=0.937,  # SGD momentum
+        weight_decay=0.0005,  # Weight decay for regularization
     )

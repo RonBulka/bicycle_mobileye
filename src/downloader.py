@@ -39,7 +39,10 @@ This script is essential for preparing training data for custom vehicle detectio
 import fiftyone as fo
 import os
 import argparse
-from .constants import TRAIN_SAMPLES, VAL_SAMPLES
+try:
+    from .constants import TRAIN_SAMPLES, VAL_SAMPLES
+except ImportError:
+    from constants import TRAIN_SAMPLES, VAL_SAMPLES
 
 def export_only_images(cwd, label_type, classes, train_samples, val_samples):
     train_output_dir = os.path.join(cwd, "images/train")
