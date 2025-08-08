@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 Image List Creation Script
 
@@ -30,7 +31,6 @@ This script is essential for preparing YOLO dataset configuration files that spe
 which images to use for training and validation phases.
 """
 
-#!/usr/bin/env python
 import os
 import argparse
 from pathlib import Path

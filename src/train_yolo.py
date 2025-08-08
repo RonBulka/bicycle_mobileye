@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 YOLO Model Training Script
 
@@ -23,16 +24,15 @@ The trained models are optimized for bicycle safety applications, detecting
 vehicles that pose collision risks to cyclists.
 """
 
-#!/usr/bin/env python
 import torch
 import argparse
 from ultralytics import YOLO
-from constants import EPOCHS, \
-                      BATCH_SIZE, \
-                      IMAGE_SIZE, \
-                      CONFIG, \
-                      MODEL, \
-                      OUTPUT_DIR
+from .constants import EPOCHS, \
+                       BATCH_SIZE, \
+                       IMAGE_SIZE, \
+                       CONFIG, \
+                       MODEL, \
+                       OUTPUT_DIR
 
 # add args to the script
 def parse_args():

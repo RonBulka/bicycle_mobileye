@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 Pretrained YOLO Video Prediction Script
 
@@ -29,14 +30,19 @@ This script is useful for:
 - Quick deployment without custom training
 """
 
-#!/usr/bin/env python
 import os
+import sys
 import argparse
 import cv2
 import torch
 from ultralytics import YOLO
-from vehicle_tracker import VehicleTracker, annotate_frame
-from constants import CONFIDENCE_THRESHOLD
+
+# Add the project root to Python path to enable imports from src
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, project_root)
+
+from src.vehicle_tracker import VehicleTracker, annotate_frame
+from src.constants import CONFIDENCE_THRESHOLD
 import time
 
 # COCO dataset vehicle class IDs

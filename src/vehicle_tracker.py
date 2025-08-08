@@ -31,7 +31,7 @@ import pygame
 import time
 import os
 import threading
-from constants import   CONFIDENCE_THRESHOLD, \
+from .constants import  CONFIDENCE_THRESHOLD, \
                         MAX_HISTORY, \
                         REMOVE_TIME_FRAME, \
                         SPEED_THRESHOLD, \

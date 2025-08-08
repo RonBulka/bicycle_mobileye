@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 Dataset Downloader Script
 
@@ -35,11 +36,10 @@ Usage:
 This script is essential for preparing training data for custom vehicle detection models.
 """
 
-#!/usr/bin/env python
 import fiftyone as fo
 import os
 import argparse
-from constants import TRAIN_SAMPLES, VAL_SAMPLES
+from .constants import TRAIN_SAMPLES, VAL_SAMPLES
 
 def export_only_images(cwd, label_type, classes, train_samples, val_samples):
     train_output_dir = os.path.join(cwd, "images/train")

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 Image Annotation Script
 
@@ -27,7 +28,6 @@ This script is used to generate training labels for custom vehicle detection mod
 when manual annotation is not feasible or to supplement existing annotations.
 """
 
-#!/usr/bin/env python
 from ultralytics import YOLO
 import os
 

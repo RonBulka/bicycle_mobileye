@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
 Model Conversion Script for OAK-D Deployment
 
@@ -33,12 +34,11 @@ This script is essential for deploying trained models on edge devices for real-t
 vehicle detection and tracking applications.
 """
 
-#!/usr/bin/env python
 import os
 import blobconverter
 import json
 from ultralytics import YOLO
-from constants import IMAGE_SIZE
+from .constants import IMAGE_SIZE
 import onnx
 
 # Image size
