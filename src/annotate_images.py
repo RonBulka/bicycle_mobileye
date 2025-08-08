@@ -1,3 +1,32 @@
+"""
+Image Annotation Script
+
+This script automatically annotates vehicle images using a pretrained YOLO model to generate
+training labels. It filters for vehicle classes and converts detections to YOLO format.
+
+Key Features:
+- Uses pretrained YOLO model (YOLOv11x) for vehicle detection
+- Filters COCO dataset vehicle classes (car, motorcycle, bus, truck)
+- Converts detections to YOLO format labels
+- Processes both training and validation datasets
+- Automatic label file generation with proper formatting
+- Confidence threshold filtering for quality control
+
+Vehicle Class Mapping:
+- COCO class 2 (car) → YOLO class 0 (vehicle)
+- COCO class 3 (motorcycle) → YOLO class 0 (vehicle)
+- COCO class 5 (bus) → YOLO class 0 (vehicle)
+- COCO class 7 (truck) → YOLO class 0 (vehicle)
+
+Output Format:
+- YOLO format: <class> <x_center> <y_center> <width> <height>
+- All coordinates are normalized (0-1)
+- One label file per image with .txt extension
+
+This script is used to generate training labels for custom vehicle detection models
+when manual annotation is not feasible or to supplement existing annotations.
+"""
+
 #!/usr/bin/env python
 from ultralytics import YOLO
 import os

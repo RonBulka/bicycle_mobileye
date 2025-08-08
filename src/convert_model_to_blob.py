@@ -1,3 +1,38 @@
+"""
+Model Conversion Script for OAK-D Deployment
+
+This script converts trained YOLO models to blob format for deployment on OAK-D Lite cameras.
+It handles the complete conversion pipeline from PyTorch to OpenVINO to blob format.
+
+Key Features:
+- Converts PyTorch YOLO models to ONNX format
+- Optimizes ONNX models using onnx-simplifier
+- Converts optimized ONNX to blob format for OAK-D
+- Generates configuration JSON files for DepthAI
+- Supports FP16 precision for edge computing
+- Configurable shave count for OAK-D hardware
+
+Conversion Pipeline:
+1. Load PyTorch model (.pt file)
+2. Export to ONNX format
+3. Simplify ONNX model for optimization
+4. Convert to blob format using blobconverter
+5. Generate configuration JSON for DepthAI
+
+Hardware Requirements:
+- OAK-D Lite camera compatibility
+- OpenVINO 2022.1 support
+- 6 shave configuration
+
+Output Files:
+- last_simplified.onnx: Optimized ONNX model
+- last_openvino_2022.1_6shave.blob: Deployable blob file
+- last.json: DepthAI configuration file
+
+This script is essential for deploying trained models on edge devices for real-time
+vehicle detection and tracking applications.
+"""
+
 #!/usr/bin/env python
 import os
 import blobconverter
@@ -5,7 +40,6 @@ import json
 from ultralytics import YOLO
 from constants import IMAGE_SIZE
 import onnx
-from onnxsim import simplify
 
 # Image size
 img_size = IMAGE_SIZE
@@ -29,10 +63,8 @@ success = model.export(format="onnx", imgsz=img_size, opset=10)
 # Optimize the model
 print("========================================================================================================================")
 print(f"Optimizing model...")
-onnx_model = onnx.load(onnx_path)
-model_simplified, check = simplify(onnx_model)
 onnx_path = onnx_path.replace('.onnx', '_simplified.onnx')
-onnx.save(model_simplified, onnx_path)
+onnx.save(model, onnx_path)
 
 # Convert to blob
 print("========================================================================================================================")

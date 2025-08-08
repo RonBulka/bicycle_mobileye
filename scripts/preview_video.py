@@ -1,3 +1,44 @@
+"""
+Video Preview Script
+
+This script provides an interactive video player with advanced controls for previewing
+processed videos and analyzing results. It supports various video formats and includes
+frame-by-frame analysis capabilities.
+
+Key Features:
+- Interactive video playback with keyboard controls
+- Frame-by-frame navigation and analysis
+- Fullscreen mode support
+- Frame capture and saving functionality
+- X11 forwarding support for remote viewing
+- Performance optimization for large videos
+- Frame counter and video information display
+
+Playback Controls:
+- 'q': Quit video playback
+- 'space': Pause/resume playback
+- 'r': Restart video from beginning
+- 'f': Toggle fullscreen mode
+- 's': Save current frame as image
+
+Video Features:
+- Automatic video scaling for performance
+- Frame counter display
+- Video property information
+- Error handling for corrupted files
+- Support for various video codecs
+
+Usage:
+    python preview_video.py --video path/to/video.mp4
+
+This script is essential for:
+- Reviewing processed video outputs
+- Analyzing detection and tracking results
+- Debugging video processing issues
+- Capturing specific frames for analysis
+- Quality control of video processing pipeline
+"""
+
 #!/usr/bin/env python
 import os
 import argparse

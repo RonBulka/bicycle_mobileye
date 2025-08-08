@@ -1,3 +1,30 @@
+"""
+YOLO Video Prediction Script
+
+This script performs real-time vehicle detection and tracking on video files using a trained YOLO model.
+It integrates with the vehicle tracker to provide collision warnings and safety alerts for bicycle riders.
+
+Key Features:
+- Video processing with customizable input/output paths
+- Real-time vehicle detection using trained YOLO models
+- Vehicle tracking with collision warning system
+- Audio warning integration for approaching vehicles
+- Video playback with interactive controls
+- Support for both custom-trained and pretrained models
+- Batch processing of multiple video files
+- Performance metrics and FPS monitoring
+
+Usage:
+    python predict.py --model path/to/model.pt --input_name video.mp4 --output_name output.mp4
+
+The script processes videos through the complete pipeline:
+1. YOLO object detection
+2. Vehicle tracking with Kalman filtering
+3. Speed and TTC calculation
+4. Warning generation for dangerous vehicles
+5. Video annotation and output generation
+"""
+
 #!/usr/bin/env python
 import os
 import argparse
@@ -173,6 +200,35 @@ def combine_audio_video(video_path: str, audio_path: str, output_path: str):
         if os.path.exists(temp_output):
             os.unlink(temp_output)
 
+def get_video_properties(video_path: str) -> dict:
+    """Get comprehensive video properties including FPS."""
+    cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        print(f"Error: Could not open video file {video_path}")
+        return {
+            'fps': 30.0,
+            'width': 640,
+            'height': 480,
+            'frame_count': 0,
+            'duration': 0
+        }
+    
+    fps = cap.get(cv2.CAP_PROP_FPS)
+    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    duration = frame_count / fps if fps > 0 else 0
+    
+    cap.release()
+    
+    return {
+        'fps': fps if fps > 0 else 30.0,
+        'width': width,
+        'height': height,
+        'frame_count': frame_count,
+        'duration': duration
+    }
+
 def main(args):
     # Load the YOLOv8 model using command line argument
     model = YOLO(args.model)
@@ -187,11 +243,14 @@ def main(args):
     video_capture = cv2.VideoCapture(input_video_path)
 
     # Get video properties
-    frame_width = int(video_capture.get(cv2.CAP_PROP_FRAME_WIDTH))
-    frame_height = int(video_capture.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    fps = int(video_capture.get(cv2.CAP_PROP_FPS))
-    total_frames = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
+    video_props = get_video_properties(input_video_path)
+    frame_width = video_props['width']
+    frame_height = video_props['height']
+    fps = video_props['fps']
+    total_frames = video_props['frame_count']
     video_duration_ms = int((total_frames / fps) * 1000)
+    
+    print(f"Video properties: {frame_width}x{frame_height}, {fps:.2f} FPS, {total_frames} frames, {video_duration_ms/1000:.2f}s duration")
 
     # Define the codec and create VideoWriter object to save output video
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
@@ -268,7 +327,7 @@ def main(args):
     
     # Create warning audio track based on recorded states
     warning_track = AudioSegment.silent(duration=video_duration_ms)
-    frame_duration_ms = int(1000 / 30)
+    frame_duration_ms = int(1000 / video_props['fps'])
     
     for i, has_warning in enumerate(warning_states):
         if has_warning:

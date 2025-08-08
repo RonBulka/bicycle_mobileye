@@ -1,3 +1,34 @@
+"""
+Pretrained YOLO Video Prediction Script
+
+This script performs vehicle detection and tracking using pretrained YOLO models (COCO dataset).
+It provides a baseline comparison for custom-trained models and supports multiple vehicle classes.
+
+Key Features:
+- Uses pretrained YOLO models (YOLOv8, YOLOv10, YOLOv11) on COCO dataset
+- Multi-class vehicle detection (car, truck, bus, motorcycle, bicycle)
+- Vehicle tracking with collision warning system
+- Video processing with customizable parameters
+- Performance comparison with custom-trained models
+- Support for various input video formats
+
+Vehicle Classes Supported:
+- Car (class 2)
+- Motorcycle (class 3)
+- Bus (class 5)
+- Truck (class 7)
+- Bicycle (class 1)
+
+Usage:
+    python predict_pretrained.py --model yolov8n.pt --input_name video.mp4
+
+This script is useful for:
+- Baseline performance evaluation
+- Testing with general-purpose models
+- Comparison with custom-trained vehicle detectors
+- Quick deployment without custom training
+"""
+
 #!/usr/bin/env python
 import os
 import argparse

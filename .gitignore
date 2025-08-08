@@ -10,3 +10,4 @@ yolo*.pt
 *.tar.xz
 *.bkp
 *.dtmp
+evaluation_vids/output/*

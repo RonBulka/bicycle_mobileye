@@ -1,3 +1,35 @@
+"""
+Image List Creation Script
+
+This script creates training and validation image lists for YOLO training by scanning
+directories and generating text files with image paths. It's used to prepare dataset
+configuration files for YOLO training.
+
+Key Features:
+- Scans directories for image files (jpg, jpeg, png, bmp)
+- Generates train/validation image lists
+- Supports relative path formatting for YOLO training
+- Automatic file sorting for consistent output
+- Validation of input directories and file types
+- Command-line interface with customizable parameters
+
+Supported Image Formats:
+- JPEG (.jpg, .jpeg)
+- PNG (.png)
+- BMP (.bmp)
+
+Output Format:
+- Text file with one image path per line
+- Relative paths with train/val prefix
+- Example: train/image001.jpg
+
+Usage:
+    python create_images_list.py --input-dir dataset/images/train --output-type train --output-dir dataset
+
+This script is essential for preparing YOLO dataset configuration files that specify
+which images to use for training and validation phases.
+"""
+
 #!/usr/bin/env python
 import os
 import argparse

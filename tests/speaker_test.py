@@ -1,3 +1,40 @@
+"""
+Raspberry Pi Speaker Testing Script
+
+This script tests speaker functionality on Raspberry Pi hardware using GPIO PWM output.
+It provides tone generation and melody playback for hardware audio testing.
+
+Key Features:
+- GPIO PWM-based tone generation
+- Musical scale and melody playback
+- Raspberry Pi hardware integration
+- Frequency control for different notes
+- Duration control for musical timing
+- GPIO cleanup and resource management
+
+Hardware Requirements:
+- Raspberry Pi with GPIO access
+- Speaker connected to GPIO18 (PWM0)
+- RPi.GPIO library installation
+
+Audio Functions:
+- play_tone(): Generates tones at specific frequencies
+- play_scale(): Plays musical scale for testing
+- Melody playback with predefined sequences
+
+Usage:
+    python speaker_test.py
+
+This script is used for:
+- Testing Raspberry Pi speaker hardware
+- Verifying GPIO PWM functionality
+- Calibrating audio output levels
+- Hardware integration testing
+
+The script provides a complete hardware audio testing solution for
+Raspberry Pi-based vehicle warning systems.
+"""
+
 import RPi.GPIO as GPIO
 import time
 import math

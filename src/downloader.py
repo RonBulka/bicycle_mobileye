@@ -1,3 +1,40 @@
+"""
+Dataset Downloader Script
+
+This script downloads and prepares vehicle datasets from Open Images V7 for training YOLO models.
+It supports both image-only and labeled dataset exports with customizable parameters.
+
+Key Features:
+- Downloads vehicle images from Open Images V7 dataset
+- Supports multiple vehicle classes (Car, Truck, Bus, Motorcycle, Van, Ambulance)
+- Configurable train/validation split ratios
+- YOLO format label export with custom class mapping
+- Automatic dataset organization and directory structure
+- Integration with FiftyOne dataset management
+
+Supported Vehicle Classes:
+- Car: Standard passenger vehicles
+- Truck: Commercial and delivery trucks
+- Bus: Public transportation buses
+- Motorcycle: Two-wheeled motor vehicles
+- Van: Commercial vans and delivery vehicles
+- Ambulance: Emergency response vehicles
+
+Dataset Structure:
+    dataset/
+    ├── images/
+    │   ├── train/     # Training images
+    │   └── val/       # Validation images
+    └── labels/
+        ├── train/     # Training labels (if export_labels=True)
+        └── val/       # Validation labels (if export_labels=True)
+
+Usage:
+    python downloader.py --export_labels --train_samples 6000 --val_samples 1500
+
+This script is essential for preparing training data for custom vehicle detection models.
+"""
+
 #!/usr/bin/env python
 import fiftyone as fo
 import os

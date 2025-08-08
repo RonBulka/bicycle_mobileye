@@ -1,3 +1,35 @@
+"""
+Audio Testing Script
+
+This script provides audio testing capabilities for the vehicle warning system, including
+tone generation and audio file playback. It's used for testing audio output functionality.
+
+Key Features:
+- Sine wave tone generation at specified frequencies
+- Melody playback (Twinkle Twinkle Little Star)
+- Audio file playback with looping
+- Volume control for testing
+- Pygame mixer integration
+- Error handling for audio device issues
+
+Audio Functions:
+- generate_tone(): Creates sine wave tones at specific frequencies
+- play_melody(): Plays predefined melody sequences
+- play_audio(): Loops audio file playback for testing
+
+Usage:
+    python audio_test.py
+
+This script is used for:
+- Testing audio hardware functionality
+- Verifying warning system audio output
+- Calibrating audio volume levels
+- Debugging audio-related issues
+
+The script supports both generated tones and pre-recorded audio files
+for comprehensive audio system testing.
+"""
+
 #!/usr/bin/env python
 import pygame
 import time

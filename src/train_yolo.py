@@ -1,3 +1,28 @@
+"""
+YOLO Model Training Script
+
+This script trains YOLO models for vehicle detection using transfer learning from pretrained weights.
+It supports custom datasets and provides comprehensive training configuration options.
+
+Key Features:
+- Transfer learning from pretrained YOLO models (YOLOv8, YOLOv10, YOLOv11)
+- Customizable training parameters (epochs, batch size, image size)
+- GPU/CPU detection and automatic device selection
+- Support for custom dataset configurations
+- Training progress monitoring and logging
+- Model checkpointing and best weight saving
+
+Training Process:
+1. Loads pretrained model weights
+2. Configures training parameters from constants or command line
+3. Trains on custom vehicle dataset
+4. Saves best model weights and training artifacts
+5. Generates training metrics and visualizations
+
+The trained models are optimized for bicycle safety applications, detecting
+vehicles that pose collision risks to cyclists.
+"""
+
 #!/usr/bin/env python
 import torch
 import argparse

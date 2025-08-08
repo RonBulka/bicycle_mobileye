@@ -1,3 +1,35 @@
+"""
+OAK-D Camera Deployment Script
+
+This script deploys trained YOLO models on OAK-D Lite cameras for real-time vehicle detection
+and tracking. It provides a complete edge computing solution for bicycle safety applications.
+
+Key Features:
+- Real-time video processing on OAK-D Lite hardware
+- YOLO model deployment using DepthAI framework
+- Vehicle tracking with collision warning system
+- Audio warning integration for dangerous vehicles
+- Video recording with annotated output
+- Test mode with live visualization
+- Optimized for edge computing performance
+
+Hardware Requirements:
+- OAK-D Lite camera
+- Compatible host system (Linux/Windows)
+- DepthAI SDK installation
+
+Deployment Process:
+1. Loads trained YOLO model in blob format
+2. Configures OAK-D camera pipeline
+3. Sets up real-time detection and tracking
+4. Processes video stream with vehicle tracking
+5. Generates warnings for approaching vehicles
+6. Records annotated video output
+
+The script is designed for production deployment on bicycle-mounted systems
+for real-time collision avoidance and safety monitoring.
+"""
+
 #!/usr/bin/env python
 import os
 import json

@@ -1,3 +1,27 @@
+"""
+Vehicle Tracker Module
+
+This module implements a real-time vehicle tracking system with collision warning capabilities.
+It uses YOLO object detection combined with Kalman filtering for robust vehicle tracking.
+
+Key Features:
+- Multi-object tracking with unique vehicle IDs
+- Kalman filter-based prediction and state estimation
+- Time-to-collision (TTC) calculation for safety warnings
+- Speed estimation based on vehicle size changes
+- Audio warning system for approaching vehicles
+- Region-of-interest (ROI) filtering for side vehicles
+- Adaptive noise filtering for improved tracking stability
+
+Classes:
+- TrackedVehicle: Represents a tracked vehicle with state and history
+- WarningStateManager: Manages audio warnings in a separate thread
+- VehicleTracker: Main tracking system that manages all vehicles
+
+The system is designed for bicycle safety applications, detecting and warning about
+approaching vehicles that pose collision risks.
+"""
+
 from dataclasses import dataclass
 from typing import Tuple, List, Dict, Protocol
 from collections import deque
@@ -364,9 +388,17 @@ class VehicleTracker:
 
 def frame_norm(frame: np.ndarray, bbox: Tuple[int, int, int, int]) -> Tuple[int, int, int, int]:
     """Normalizes bounding box coordinates to frame dimensions."""
-    norm_vals = np.full(len(bbox), frame.shape[0])
-    norm_vals[::2] = frame.shape[1]
-    return (np.clip(np.array(bbox), 0, 1) * norm_vals).astype(int)
+    # Handle both frame objects and frame shape arrays
+    if hasattr(frame, 'shape') and len(frame.shape) >= 2:
+        # frame is an actual frame object
+        height, width = frame.shape[0], frame.shape[1]
+    else:
+        # frame is a shape array [height, width, channels]
+        height, width = frame[0], frame[1]
+    
+    # Create normalization values: [width, height, width, height] for [xmin, ymin, xmax, ymax]
+    norm_vals = np.array([width, height, width, height])
+    return tuple((np.clip(np.array(bbox), 0, 1) * norm_vals).astype(int))
 
 def annotate_frame(frame: np.ndarray, tracked_vehicles: List[TrackedVehicle], fps: float) -> np.ndarray:
     """Annotates a frame with tracked vehicles and their metrics."""
