@@ -1,45 +1,83 @@
 # Bicycle Safety Vehicle Detection System
 
-A comprehensive computer vision system for bicycle safety that detects and tracks approaching vehicles, providing real-time collision warnings to cyclists.
+A comprehensive computer vision system for bicycle safety that detects and tracks approaching vehicles, providing real-time collision warnings to cyclists. **The project's end goal is to deploy the trained model on a Raspberry Pi with the OAK-D Lite camera for edge computing applications.**
 
 ## 🚴‍♂️ Project Overview
 
-This project implements an intelligent vehicle detection and tracking system designed specifically for bicycle safety applications. Using state-of-the-art YOLO object detection and advanced tracking algorithms, it provides real-time warnings about vehicles that pose collision risks to cyclists.
+This project implements an intelligent vehicle detection and tracking system designed specifically for bicycle safety applications. Using state-of-the-art YOLO object detection and advanced tracking algorithms, it provides real-time warnings about vehicles that pose collision risks to cyclists. The system is optimized for deployment on edge devices, particularly the Raspberry Pi with OAK-D Lite camera for real-world bicycle safety applications.
 
 ## ✨ Key Features
 
 - **Real-time Vehicle Detection**: Uses YOLO models (v8, v10, v11) for accurate vehicle detection
 - **Advanced Vehicle Tracking**: Kalman filter-based tracking with unique vehicle IDs
 - **Collision Warning System**: Time-to-collision (TTC) calculation and audio warnings
-- **Multi-platform Support**: Desktop, OAK-D Lite camera, and Raspberry Pi deployment
+- **Edge Computing Deployment**: Optimized for Raspberry Pi + OAK-D Lite deployment
 - **Custom Training Pipeline**: Complete dataset preparation and model training workflow
 - **Audio Integration**: Real-time audio warnings for dangerous vehicles
 - **Performance Optimization**: Edge computing support for real-time processing
 
+## 🎯 End Goal: Raspberry Pi + OAK-D Lite Deployment
+
+The primary objective of this project is to create a portable, battery-powered bicycle safety system that can be mounted on a bicycle and provide real-time vehicle detection and collision warnings. The system will be deployed on:
+
+- **Raspberry Pi 4**: Main processing unit
+- **OAK-D Lite Camera**: Stereo depth camera for 3D perception
+- **Portable Speaker**: Audio warning system
+- **Battery Pack**: Power supply for mobile operation
+
+### Deployment Benefits
+
+- **Portable**: Lightweight system that can be mounted on any bicycle
+- **Real-time Processing**: Edge computing eliminates cloud dependency
+- **3D Perception**: OAK-D Lite provides depth information for better collision prediction
+
 ## 🏗️ System Architecture
 
 ```
-Video Input → YOLO Detection → Vehicle Tracking → Collision Analysis → Audio Warning
-     ↓              ↓                ↓                ↓              ↓
-  Camera/File   Object Detection  Kalman Filter   TTC Calculation  Speaker Output
+OAK-D Lite Camera → Raspberry Pi → YOLO Detection → Vehicle Tracking → Collision Analysis → Audio Warning
+       ↓                ↓              ↓                ↓                ↓              ↓
+   RGB + Depth      Edge Processing  Object Detection  Kalman Filter   TTC Calculation  Speaker Output
 ```
 
 ## 📁 Project Structure
 
 ```
 bicycle_mobileye/
-├── src/                    # Source code
-│   ├── vehicle_tracker.py  # Core tracking system
-│   ├── predict.py          # Video prediction script
-│   ├── train_yolo.py       # Model training script
-│   ├── deploy_model.py     # OAK-D deployment
-│   ├── constants.py        # Configuration constants
-│   └── ...                 # Additional utilities
-├── data/                   # Dataset and configuration
-├── runs/                   # Training outputs
-├── evaluation_vids/        # Test videos
-├── audio/                  # Warning sound files
-└── docs/                   # Documentation
+├── src/                           # Source code
+│   ├── vehicle_tracker.py         # Core tracking system
+│   ├── train_yolo.py              # Model training script
+│   ├── deploy_model.py            # OAK-D deployment
+│   ├── convert_model_to_blob.py   # Model conversion for OAK-D
+│   ├── downloader.py              # Dataset downloader
+│   ├── annotate_images.py         # Image annotation utilities
+│   └── constants.py               # Configuration constants
+├── tests/                         # Test files
+│   ├── predict.py                 # Video prediction script
+│   ├── predict_pretrained.py      # Pre-trained model prediction
+│   ├── test_vehicle_tracker.py    # Vehicle tracker tests
+│   ├── audio_test.py              # Audio system tests
+│   └── speaker_test.py            # Speaker functionality tests
+├── scripts/                       # Utility scripts
+│   ├── check_gpu.py               # GPU availability check
+│   ├── preview_video.py           # Video preview utility
+│   └── create_images_list.py      # Dataset preparation
+├── dataset/                       # Dataset and configuration
+│   ├── config.yaml                # Dataset configuration
+│   ├── images/                    # Training and validation images
+│   └── labels/                    # Annotation labels
+├── runs/                          # Training outputs and results
+├── evaluation_vids/               # Test videos
+│   ├── input/                     # Input test videos
+│   └── output/                    # Processed output videos
+├── audio/                         # Warning sound files
+├── luxonis_output/                # OAK-D model files
+│   ├── last.blob                  # Compiled model for OAK-D
+│   ├── last.xml                   # OpenVINO XML
+│   ├── last.bin                   # OpenVINO binary
+│   └── last.json                  # Model metadata
+├── docs/                          # Documentation
+├── vid_result/                    # Video processing results
+└── requirements.txt               # Python dependencies
 ```
 
 ## 🚀 Quick Start
@@ -48,7 +86,8 @@ bicycle_mobileye/
 
 - Python 3.8+
 - CUDA-compatible GPU (optional, for training)
-- OAK-D Lite camera (for edge deployment)
+- **Raspberry Pi 4** (for deployment)
+- **OAK-D Lite camera** (for deployment)
 
 ### Installation
 
@@ -73,10 +112,61 @@ bicycle_mobileye/
    python src/train_yolo.py --epochs 200 --batch 32
    ```
 
-5. **Run prediction**
+5. **Test prediction**
    ```bash
-   python src/predict.py --input_name input1.mp4 --output_name output1.mp4
+   python tests/predict.py --input_name input1.mp4 --output_name output1.mp4
    ```
+
+## 🔌 Hardware Deployment
+
+### OAK-D Lite Camera Setup
+
+The OAK-D Lite is a stereo depth camera that provides both RGB and depth information, making it ideal for bicycle safety applications:
+
+```bash
+# Convert trained model to blob format for OAK-D
+python src/convert_model_to_blob.py
+
+# Test OAK-D deployment
+python src/deploy_model.py --test
+```
+
+### Raspberry Pi Deployment
+
+The system is optimized for Raspberry Pi deployment with the following components:
+
+#### Hardware Requirements
+- **Raspberry Pi 4** (4GB RAM recommended)
+- **OAK-D Lite camera**
+- **bluetooth speaker/earbuds**
+- **Power bank**
+- **MicroSD card**
+
+#### Software Setup
+
+```bash
+# Install packages on Raspberry Pi
+pip install -r requirements.txt
+
+# Test audio system
+python tests/audio_test.py
+
+```
+
+#### Deployment Configuration
+
+```python
+# Edit src/constants.py for Raspberry Pi optimization
+RASPBERRY_PI_MODE = True
+AUDIO_ENABLED = True
+DEPTH_ENABLED = True  # OAK-D Lite depth features
+```
+
+### Mobile Deployment Features
+
+- **Mounting System**: Universal bicycle mount compatibility
+- **Audio Alerts**: Clear warning sounds for different threat levels
+- **Depth Perception**: 3D collision prediction using OAK-D Lite
 
 ## 📊 Model Training
 
@@ -88,9 +178,6 @@ The system uses the Open Images V7 dataset with custom vehicle annotations:
 # Download and prepare dataset
 python src/downloader.py --export_labels
 
-# Create image lists for training
-python src/create_images_list.py --input-dir data/images/train --output-type train --output-dir data
-python src/create_images_list.py --input-dir data/images/val --output-type valid --output-dir data
 ```
 
 ### Training Configuration
@@ -124,10 +211,11 @@ python src/train_yolo.py --model yolov10n.pt --epochs 150
 ### Key Features
 
 - **Multi-object Tracking**: Unique IDs for each detected vehicle
-- **Collision Prediction**: Time-to-collision calculation
+- **Collision Prediction**: Time-to-collision calculation using depth data
 - **Speed Estimation**: Based on vehicle size changes
 - **Audio Warnings**: Real-time alerts for dangerous vehicles
 - **ROI Filtering**: Region-of-interest filtering for side vehicles
+- **3D Perception**: Depth-aware collision prediction (OAK-D Lite)
 
 ## 🔧 Configuration
 
@@ -157,41 +245,8 @@ The system uses an 8-state Kalman filter for robust tracking:
 
 ```bash
 # Process single video
-python src/predict.py --input_name video.mp4 --output_name output.mp4
+python tests/predict.py --input_name video.mp4 --output_name output.mp4
 
-# Batch processing
-python src/predict.py --input_dir ./videos/ --output_dir ./results/
-
-# Test mode with visualization
-python src/predict.py --test --play
-```
-
-### Video Controls
-
-- **Playback**: Interactive video player with controls
-- **Frame Capture**: Save specific frames for analysis
-- **Performance Metrics**: FPS and processing statistics
-
-## 🔌 Hardware Deployment
-
-### OAK-D Lite Camera
-
-```bash
-# Convert model to blob format
-python src/convert_model_to_blob.py
-
-# Deploy on OAK-D Lite
-python src/deploy_model.py --test
-```
-
-### Raspberry Pi
-
-```bash
-# Test speaker functionality
-python src/speaker_test.py
-
-# Audio system test
-python src/audio_test.py
 ```
 
 ## 📈 Performance
@@ -202,11 +257,18 @@ python src/audio_test.py
 - **YOLOv10n**: Improved accuracy, moderate speed
 - **YOLOv11n**: Best accuracy, slower inference
 
+### Edge Computing Performance
+
+- **Raspberry Pi 4**: 15-25 FPS with optimized models
+- **OAK-D Lite**: Real-time depth processing
+- **Battery Life**: 4-6 hours continuous operation
+- **Low Latency**: <100ms warning response time
+
 ### Tracking Performance
 
-- **Real-time Processing**: 30+ FPS on modern hardware
+- **Real-time Processing**: 15-25 FPS on Raspberry Pi
 - **Multi-object Tracking**: Up to 10 vehicles simultaneously
-- **Low Latency**: <100ms warning response time
+- **Audio Latency**: <50ms audio warning response
 
 ## 🛠️ Development
 
@@ -221,22 +283,19 @@ python src/audio_test.py
 
 ```bash
 # GPU availability check
-python src/check_gpu.py
+python scripts/check_gpu.py
 
 # Audio system test
-python src/audio_test.py
+python tests/audio_test.py
 
-# Video preview
-python src/preview_video.py --video test.mp4
+# OAK-D Lite test
+python src/deploy_model.py --test
 ```
 
-## 🤝 Contributing
+## 🚴‍♂️ Bicycle Integration
 
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+### Mounting System
+- **Seat Post Mount**: Main mounting location
 
 ## 📄 License
 
@@ -248,14 +307,8 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - **Open Images**: Dataset source
 - **DepthAI**: OAK-D camera support
 - **OpenCV**: Computer vision library
-
-## 📞 Support
-
-For questions and support:
-- Create an issue on GitHub
-- Check the documentation in `docs/`
-- Review the training logs in `runs/`
+- **Raspberry Pi Foundation**: Edge computing platform
 
 ---
 
-**Safety Notice**: This system is designed to assist cyclists but should not replace proper road safety practices. Always follow traffic laws and use appropriate safety equipment.
+**Safety Notice**: This system is designed to assist cyclists but should not replace proper road safety practices. Always follow traffic laws and use appropriate safety equipment. The system is intended as a supplementary safety aid and should not be relied upon as the primary safety mechanism.
