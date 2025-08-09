@@ -92,16 +92,5 @@ if __name__ == '__main__':
         epochs=args.epochs,
         batch=args.batch,
         imgsz=args.imgsz,
-        project=args.output,
-        # Memory optimization parameters
-        cache=True,  # Cache images in RAM for faster training
-        workers=4,   # Reduce number of workers to save memory
-        device=0 if torch.cuda.is_available() else 'cpu',  # Explicitly set device
-        # Stability parameters
-        patience=50,  # Early stopping patience
-        save_period=10,  # Save checkpoints every 10 epochs
-        lr0=0.01,  # Initial learning rate
-        lrf=0.01,  # Final learning rate factor
-        momentum=0.937,  # SGD momentum
-        weight_decay=0.0005,  # Weight decay for regularization
+        project=args.output
     )
