@@ -1,0 +1,43 @@
+[Unit]
+Description=Bicycle Mobileye System with OAK-D Camera
+After=network.target bluetooth.target
+Wants=network.target bluetooth.target
+Requires=bluetooth.target
+# Wait for USB devices to be ready
+After=dev-ttyUSB0.device dev-ttyACM0.device
+# Wait for camera to be detected
+After=sys-subsystem-usb-devices-03e7.device
+
+[Service]
+Type=simple
+User=bulka
+Group=bulka
+WorkingDirectory=/home/bulka/GIT/bicycle_mobileye
+ExecStartPre=/bin/bash /home/bulka/GIT/bicycle_mobileye/scripts/startup_check.sh
+ExecStart=/usr/bin/python3 /home/bulka/GIT/bicycle_mobileye/src/deploy_model.py -t
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+# Environment variables
+Environment=PYTHONPATH=/home/bulka/GIT/bicycle_mobileye/src
+Environment=DISPLAY=:0
+Environment=PULSE_RUNTIME_PATH=/run/user/1000/pulse
+Environment=DBUS_SESSION_BUS_ADDRESS=unix:path=/run/user/1000/bus
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/home/bulka/GIT/bicycle_mobileye/vid_result /home/bulka/GIT/bicycle_mobileye/logs /dev/bus/usb /run/user/1000/pulse /run/user/1000/bus
+# Allow access to USB devices and audio
+SupplementaryGroups=video audio plugdev
+
+# Graceful shutdown
+TimeoutStopSec=30
+KillMode=mixed
+KillSignal=SIGTERM
+
+[Install]
+WantedBy=multi-user.target
