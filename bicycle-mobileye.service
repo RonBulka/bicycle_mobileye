@@ -1,7 +1,7 @@
 [Unit]
 Description=Bicycle Mobileye System with OAK-D Camera
-After=network.target bluetooth.target
-Wants=network.target bluetooth.target
+After=bluetooth.target
+Wants=bluetooth.target
 Requires=bluetooth.target
 # Wait for USB devices to be ready
 After=dev-ttyUSB0.device dev-ttyACM0.device
@@ -14,7 +14,7 @@ User=bulka
 Group=bulka
 WorkingDirectory=/home/bulka/GIT/bicycle_mobileye
 ExecStartPre=/bin/bash /home/bulka/GIT/bicycle_mobileye/scripts/startup_check.sh
-ExecStart=/usr/bin/python3 /home/bulka/GIT/bicycle_mobileye/src/deploy_model.py -t
+ExecStart=/usr/bin/python3 /home/bulka/GIT/bicycle_mobileye/src/deploy_model.py
 Restart=always
 RestartSec=10
 StandardOutput=journal

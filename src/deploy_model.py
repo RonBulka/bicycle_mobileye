@@ -11,7 +11,7 @@ Key Features:
 - Vehicle tracking with collision warning system
 - Audio warning integration for dangerous vehicles
 - Video recording with annotated output
-- Periodic video segmentation (every 10 minutes)
+- Periodic video segmentation (every 3 minutes)
 - Test mode with live visualization
 - Optimized for edge computing performance
 
@@ -55,7 +55,7 @@ YOLO_MODEL = os.path.join(cwd, "luxonis_output/last_openvino_2022.1_6shave.blob"
 OUTPUT_DIR = "vid_result/"
 
 # Video segmentation settings
-SEGMENT_DURATION = 600  # 10 minutes in seconds
+SEGMENT_DURATION = 180  # 3 minutes in seconds
 
 class VideoSegmentManager:
     """Manages periodic video segmentation and output file naming."""

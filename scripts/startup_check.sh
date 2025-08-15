@@ -224,10 +224,10 @@ check_project_directories() {
 
 # Main execution
 main() {
-    log_message "=== Bicycle Safety System Startup Check ==="
-    
     # Create log file
     touch "$LOG_FILE"
+
+    log_message "=== Bicycle Mobileye Startup Check ==="
     
     # Check system resources first
     check_system_resources
