@@ -95,7 +95,7 @@ bicycle_mobileye/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/bicycle_mobileye.git
+   git clone https://github.com/RonBulka/bicycle_mobileye.git
    cd bicycle_mobileye
    ```
 
