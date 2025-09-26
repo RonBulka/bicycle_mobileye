@@ -49,7 +49,6 @@ bicycle_mobileye/
 │   ├── deploy_model.py            # OAK-D deployment
 │   ├── convert_model_to_blob.py   # Model conversion for OAK-D
 │   ├── downloader.py              # Dataset downloader
-│   ├── annotate_images.py         # Image annotation utilities
 │   └── constants.py               # Configuration constants
 ├── tests/                         # Test files
 │   ├── predict.py                 # Video prediction script
@@ -58,10 +57,12 @@ bicycle_mobileye/
 │   ├── audio_test.py              # Audio system tests
 │   └── speaker_test.py            # Speaker functionality tests
 ├── scripts/                       # Utility scripts
+│   ├── annotate_images.py         # Image annotation utilities
 │   ├── check_gpu.py               # GPU availability check
 │   ├── preview_video.py           # Video preview utility
-│   └── create_images_list.py      # Dataset preparation
-├── dataset/                       # Dataset and configuration
+│   ├── create_images_list.py      # Dataset preparation
+│   └── startup_check.sh           # System startup verification
+├── dataset/                       # Primary dataset
 │   ├── config.yaml                # Dataset configuration
 │   ├── images/                    # Training and validation images
 │   └── labels/                    # Annotation labels
@@ -69,7 +70,7 @@ bicycle_mobileye/
 ├── evaluation_vids/               # Test videos
 │   ├── input/                     # Input test videos
 │   └── output/                    # Processed output videos
-├── audio/                         # Warning sound files
+├── audio/                         # Sound files
 ├── luxonis_output/                # OAK-D model files
 │   ├── last.blob                  # Compiled model for OAK-D
 │   ├── last.xml                   # OpenVINO XML
@@ -77,6 +78,7 @@ bicycle_mobileye/
 │   └── last.json                  # Model metadata
 ├── docs/                          # Documentation
 ├── vid_result/                    # Video processing results
+├── bicycle-mobileye.service       # Systemd service configuration
 └── requirements.txt               # Python dependencies
 ```
 
