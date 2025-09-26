@@ -120,13 +120,6 @@ check_usb_permissions() {
     else
         log_message "⚠ User not in plugdev group, USB access may be limited"
     fi
-    
-    # Check if udev rules are loaded
-    if [ -f "/etc/udev/rules.d/99-oakd.rules" ]; then
-        log_message "✓ OAK-D udev rules found"
-    else
-        log_message "⚠ OAK-D udev rules not found"
-    fi
 }
 
 # Function to check system resources

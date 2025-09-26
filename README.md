@@ -35,8 +35,8 @@ The primary objective of this project is to create a portable, battery-powered b
 
 ```
 OAK-D Lite Camera → Raspberry Pi → YOLO Detection → Vehicle Tracking → Collision Analysis → Audio Warning
-       ↓                ↓              ↓                ↓                ↓              ↓
-   RGB + Depth      Edge Processing  Object Detection  Kalman Filter   TTC Calculation  Speaker Output
+       ↓                ↓                ↓                 ↓                  ↓                   ↓
+   RGB + Depth    Edge Processing  Object Detection   Kalman Filter     TTC Calculation     Speaker Output
 ```
 
 ## 📁 Project Structure
@@ -117,6 +117,11 @@ bicycle_mobileye/
    python tests/predict.py --input_name input1.mp4 --output_name output1.mp4
    ```
 
+6. **Deploy model**
+   ```bash
+   python src/deploy_model.py
+   ```
+
 ## 🔌 Hardware Deployment
 
 ### OAK-D Lite Camera Setup
@@ -152,21 +157,73 @@ pip install -r requirements.txt
 python tests/audio_test.py
 
 ```
+#### Manual Installation
 
-#### Deployment Configuration
+##### 1. Install System Dependencies
 
-```python
-# Edit src/constants.py for Raspberry Pi optimization
-RASPBERRY_PI_MODE = True
-AUDIO_ENABLED = True
-DEPTH_ENABLED = True  # OAK-D Lite depth features
+```bash
+sudo apt update
+sudo apt upgrade -y
+sudo apt install -y python3 python3-pip python3-venv git
 ```
 
-### Mobile Deployment Features
+##### 2. Install Python Dependencies
 
-- **Mounting System**: Universal bicycle mount compatibility
-- **Audio Alerts**: Clear warning sounds for different threat levels
-- **Depth Perception**: 3D collision prediction using OAK-D Lite
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+##### 3. Set Up Systemd Service
+
+Copy the service file:
+```bash
+sudo cp bicycle-mobileye.service /etc/systemd/system/
+```
+
+Edit the service file to match your paths:
+```bash
+sudo nano /etc/systemd/system/bicycle-mobileye.service
+```
+
+Enable and start the service:
+```bash
+# Enable and start
+sudo systemctl enable bicycle-mobileye
+sudo systemctl start bicycle-mobileye
+```
+#### Monitoring
+
+##### Service Status
+```bash
+# Check service status
+sudo systemctl status bicycle-mobileye
+
+# Check if running
+sudo systemctl is-active bicycle-mobileye
+
+# View recent logs
+sudo journalctl -u bicycle-mobileye -n 50
+
+# Follow logs in real-time
+sudo journalctl -u bicycle-mobileye -f
+
+# Check startup script
+cat /tmp/bicycle_startup.log
+```
+
+##### Hardware Status
+```bash
+# Check camera
+lsusb | grep 03e7
+
+# Check Bluetooth
+bluetoothctl show
+
+# Check audio
+pactl list short sinks
+```
 
 ## 📊 Model Training
 
@@ -261,14 +318,11 @@ python tests/predict.py --input_name video.mp4 --output_name output.mp4
 
 - **Raspberry Pi 4**: 15-25 FPS with optimized models
 - **OAK-D Lite**: Real-time depth processing
-- **Battery Life**: 4-6 hours continuous operation
-- **Low Latency**: <100ms warning response time
 
 ### Tracking Performance
 
 - **Real-time Processing**: 15-25 FPS on Raspberry Pi
-- **Multi-object Tracking**: Up to 10 vehicles simultaneously
-- **Audio Latency**: <50ms audio warning response
+- **Multi-object Tracking**: Handling multiple vehicles
 
 ## 🛠️ Development
 
