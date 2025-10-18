@@ -227,6 +227,23 @@ bluetoothctl show
 pactl list short sinks
 ```
 
+#### Bluetooth Device Configuration
+
+If the startup check fails due to Bluetooth device not being found, you need to modify the Bluetooth device check in `scripts/startup_check.sh` to match your specific device:
+
+1. Find your Bluetooth device name/pattern:
+```bash
+bluetoothctl devices
+```
+2. Update the device pattern in `scripts/startup_check.sh`:
+```bash
+local saved_devices=$(bluetoothctl devices | grep -E "(speaker|Speaker|SPEAKER|headphone|Headphone|HEADPHONE|Jabra|jabra)" || true)
+```
+3. Restart the service:
+```bash
+sudo systemctl restart bicycle-mobileye
+```
+
 ## 📊 Model Training
 
 ### Dataset Preparation
